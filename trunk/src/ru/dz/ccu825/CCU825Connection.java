@@ -1,6 +1,8 @@
 package ru.dz.ccu825;
 
 import ru.dz.ccu825.payload.CCU825DeviceInfo;
+import ru.dz.ccu825.payload.CCU825SysInfo;
+import ru.dz.ccu825.pkt.CCU825SysInfoReqPacket;
 
 /**
  * 
@@ -225,11 +227,21 @@ public class CCU825Connection {
 
 
 
-	public void getSysInfo() {
-		// TODO Auto-generated method stub
-
+	/**
+	 * Does a request
+	 * @return sysinfo (i/o state etc) at the current moment
+	 * @throws CCU825ProtocolException
+	 */
+	public CCU825SysInfo getSysInfo() throws CCU825ProtocolException 
+	{
+		CCU825Packet rp = exchange(new CCU825SysInfoReqPacket() );
+		return new CCU825SysInfo(rp.getPacketPayload());
 	}
 
+	/**
+	 * 
+	 * @return device info as we got in protocol init transaction
+	 */
 	public CCU825DeviceInfo getDeviceInfo() {
 		return deviceInfo;
 	}
