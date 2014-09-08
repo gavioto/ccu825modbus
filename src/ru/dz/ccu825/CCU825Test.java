@@ -31,7 +31,7 @@ public class CCU825Test {
 		}
 
 		
-		
+		System.out.println(c.getDeviceInfo());
 		
 	}
 
