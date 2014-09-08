@@ -32,6 +32,16 @@ public class CCU825Test {
 
 		
 		System.out.println(c.getDeviceInfo());
+	
+		for( int i = 20; i > 0; i-- )
+		{
+			try {
+				System.out.println(c.getSysInfo());
+			} catch (CCU825ProtocolException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}			
+		}
 		
 	}
 
