@@ -22,9 +22,7 @@ public class ProxyModbus implements ModBusConnection {
 	}
 
 	@Override
-	public byte[] rwMultiple(int readStartAddress, int nRead,
-			int writeStartAddress, int nWrite, int writeBytes, byte[] writeData) {
-		// TODO Auto-generated method stub
+	public byte[] rwMultiple(int nRead, byte[] writeData) {
 		return new byte[0];
 	}
 
