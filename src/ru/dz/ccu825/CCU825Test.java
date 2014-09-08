@@ -9,19 +9,19 @@ public class CCU825Test {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		
-		// test rc4 first
-		test_rc4();
-		
+	public static void main(String[] args) {				
 		
 		ModBusConnection mc = new ProxyModbus();
+
+		byte[] key = { 0x00, 0x00, 0x00, 0x00 };
+		
+		CCU825Connection c = new CCU825Connection(mc, key);
 		
 		try {
-			byte[] key = { 0x00, 0x00, 0x00, 0x00 };
-			
-			CCU825Connection c = new CCU825Connection(mc, key);
-			
+		
+			CCU825ReturnCode protocolRC = c.connect();
+			System.out.print("RC = " + protocolRC ); // TODO move out
+					
 			c.getSysInfo();
 			
 		} catch (CCU825Exception e) {
@@ -35,24 +35,7 @@ public class CCU825Test {
 		
 	}
 
-	private static void test_rc4() {
-		byte[] key = { 0x01, 0x02, 0x03, 0x04, 0x05 };
-		byte[] inp =  
-			{
-				(byte)0xb2, 0x39, 0x63, 0x05,  (byte)0xf0, 0x3d, (byte)0xc0, 0x27,   (byte)0xcc, (byte)0xc3, 0x52, 0x4a,  0x0a, 0x11, 0x18, (byte)0xa8
-			};
-		RC4 enc = new RC4(key );
 
-		byte[] out = enc.encrypt(inp);
-		checkzero(out);
-		//dumpBytes("enc", out);
-	}
-
-	private static void checkzero(byte[] out) {
-		for( int i = 0; i < out.length; i++ )
-			if( out[i] != 0 )
-				throw new RuntimeException("Nonzero array item at " + i);
-	}
 
 	public static void dumpBytes(String string, byte[] b) 
 	{
