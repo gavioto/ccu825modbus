@@ -6,6 +6,13 @@ import java.nio.ByteOrder;
 import ru.dz.ccu825.CCU825Packet;
 import ru.dz.ccu825.util.CCU825PacketFormatException;
 
+/**
+ * SysInfo payload decoder
+ * @author dz
+ *
+ */
+
+
 public class CCU825SysInfo {
 
 	
@@ -86,7 +93,9 @@ public class CCU825SysInfo {
 		return outBits;
 	}
 
-
+	/**
+	 * @return Array of input values in volts
+	 */
 	public double[] getInValue() {
 		return inValue;
 	}

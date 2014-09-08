@@ -1,10 +1,33 @@
 package ru.dz.ccu825.data;
 
+/**
+ * Represents state of a guard zone (partition) = what CCU does for that zone: 
+ * <ul>
+ * 	<li>Guarding (Arm)
+ * 	<li>Protecting
+ * 	<li>Just monitoring (Disarm)
+ * </ul>
+ * 
+ * See CCU825 manual for details
+ * 
+ * <br>
+ * @author dz
+ *
+ */
+
 public enum GuardState {
+	/** 
+	 * Unknown state is used as a 'No state change' in PartitionStateCmd
+	 */
 	Unknown, // No change in modify style calls
 	Disarm,
 	Protect,
 	Arm;
+	
+	/**
+	 * Convert to bits for a PartitionStateCmd packet payload
+	 * @return 2 bits of encoded state
+	 */
 	
 	public byte toCmdBits()
 	{

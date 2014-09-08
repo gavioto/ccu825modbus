@@ -6,6 +6,12 @@ import java.nio.ByteOrder;
 import ru.dz.ccu825.CCU825Packet;
 import ru.dz.ccu825.util.CCU825PacketFormatException;
 
+/**
+ * TODO Events packet payload decoder
+ * @author dz
+ *
+ */
+
 public class CCU825Events {
 
 	

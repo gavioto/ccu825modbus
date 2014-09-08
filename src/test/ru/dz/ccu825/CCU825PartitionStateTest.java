@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import ru.dz.ccu825.data.GuardState;
-import ru.dz.ccu825.payload.CCU825OutState;
 import ru.dz.ccu825.payload.CCU825PartitionState;
 import ru.dz.ccu825.util.CCU825PacketFormatException;
 

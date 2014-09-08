@@ -1,12 +1,14 @@
 package ru.dz.ccu825.payload;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 import ru.dz.ccu825.CCU825Packet;
 import ru.dz.ccu825.data.GuardState;
-import ru.dz.ccu825.pkt.CCU825OutStateCmdPacket;
 import ru.dz.ccu825.util.CCU825PacketFormatException;
+
+/**
+ * PartitionState payload decoder
+ * @author dz
+ *
+ */
 
 public class CCU825PartitionState {
 

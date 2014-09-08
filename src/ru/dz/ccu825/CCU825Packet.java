@@ -52,9 +52,9 @@ public class CCU825Packet {
 	private byte[] payload;
 	
 	/**
-	 * Construct packet object from raw protol data received from modbus io transaction.
+	 * Construct packet object from raw protocol data received from ModBus IO transaction.
 	 * 
-	 * @param data What we've got from modbus fn23 
+	 * @param data What we've got from ModBus fn23 
 	 * 
 	 * @throws CCU825CheckSumException
 	 * @throws CCU825PacketFormatException
@@ -85,7 +85,7 @@ public class CCU825Packet {
 
 
 	/**
-	 * Get raw packet to send to modbus fn23.
+	 * Get raw packet to send to ModBus fn23.
 	 * @return packet bytes.
 	 */
 
@@ -191,11 +191,24 @@ public class CCU825Packet {
 			throw new CCU825CheckSumException("got " + recvCheckSum + "in pkt, calculated "+ calcCheckSum);
 	}
 
+	
+	/** Calc a checksum for a packet.
+	 * 
+	 * @param data packet
+	 * @return 16 bits of a checksum
+	 */
+	
 	private int makeCheckSum(byte[] data) {
 		return CRC16.crc(data) & 0xFFFF; // Make sure int has just 16 bits
 	}
 	
 	
+	
+	/**
+	 * Construct packet for transmission from flags byte and payload. 
+	 * @param flags
+	 * @param payload
+	 */
 	
 	
 	protected CCU825Packet( byte flags, byte [] payload ) {
