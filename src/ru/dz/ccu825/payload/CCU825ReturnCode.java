@@ -1,4 +1,4 @@
-package ru.dz.ccu825;
+package ru.dz.ccu825.payload;
 
 /**
  * CCU825 protocol return codes.

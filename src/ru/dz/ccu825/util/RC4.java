@@ -1,4 +1,4 @@
-package ru.dz.ccu825;
+package ru.dz.ccu825.util;
 
 // got fro0m http://stackoverflow.com/questions/12289717/rc4-encryption-java
 

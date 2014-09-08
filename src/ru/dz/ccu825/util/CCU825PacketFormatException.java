@@ -1,4 +1,5 @@
-package ru.dz.ccu825;
+package ru.dz.ccu825.util;
+
 
 public class CCU825PacketFormatException extends CCU825ProtocolException {
 

@@ -3,6 +3,8 @@ package ru.dz.ccu825;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import ru.dz.ccu825.util.CCU825CheckSumException;
+import ru.dz.ccu825.util.CCU825PacketFormatException;
 import ru.dz.ccu825.util.CRC16;
 
 /**

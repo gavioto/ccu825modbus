@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import ru.dz.ccu825.CCU825Packet;
-import ru.dz.ccu825.CCU825PacketFormatException;
+import ru.dz.ccu825.util.CCU825PacketFormatException;
 
 /**
  * DeviceInfo packet decoder
