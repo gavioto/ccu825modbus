@@ -25,16 +25,21 @@ public class CCU825Packet {
 
 
 	// Answers
-	public static final byte PKT_TYPE_RETCODE = 0x01; // ANSWER
-	public static final byte PKT_TYPE_DEVICEINFO = 0x02; // ANSWER
-	public static final byte PKT_TYPE_SYSINFO = 0x03; // ANSWER
+	public static final byte PKT_TYPE_RETCODE = 0x01;
+	public static final byte PKT_TYPE_DEVICEINFO = 0x02;
+	public static final byte PKT_TYPE_SYSINFO = 0x03;
+	public static final byte PKT_TYPE_EVENTS = 0x04;
+	public static final byte PKT_TYPE_OUTSTATE = 0x06;
 
 	// REQUESTS
 	public static final byte PKT_TYPE_EMPTY = 0x00;
 
 	public static final byte PKT_TYPE_INFOREQ = 0x01;
+	
+	// 2nd byte for PKT_TYPE_INFOREQ req
 	public static final byte PKT_TYPE_DEVICEINFO_SUBREQ = 0x01;
 	public static final byte PKT_TYPE_SYSINFO_SUBREQ = 0x00;
+	public static final byte PKT_TYPE_OUTSTATE_SUBREQ = 0x03;
 	
 
 	
