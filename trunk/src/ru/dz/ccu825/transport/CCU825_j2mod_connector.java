@@ -130,7 +130,14 @@ public class CCU825_j2mod_connector implements ModBusConnection {
 		byte[] recvData = data.getMessage();
 		CCU825Test.dumpBytes("recv", recvData);
 		
-		return recvData;
+		assert( recvData.length == nRead*2+1 );
+		
+		byte[] justRegs = new byte[nRead*2]; 
+
+		// remove 1st byte - contains len of array
+		System.arraycopy(recvData, 1, justRegs, 0, nRead*2);
+		
+		return justRegs;
 		/*
 		InputRegister[] values = data.getRegisters();
 		System.out.println("Data: " + Arrays.toString(values));
