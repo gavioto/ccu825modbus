@@ -1,11 +1,13 @@
 package ru.dz.ccu825;
 
 import ru.dz.ccu825.payload.CCU825DeviceInfo;
+import ru.dz.ccu825.payload.CCU825OutState;
 import ru.dz.ccu825.payload.CCU825ReturnCode;
 import ru.dz.ccu825.payload.CCU825SysInfo;
 import ru.dz.ccu825.pkt.CCU825DeviceInfoAckPacket;
 import ru.dz.ccu825.pkt.CCU825DeviceInfoReqPacket;
 import ru.dz.ccu825.pkt.CCU825EmptyPacket;
+import ru.dz.ccu825.pkt.CCU825OutStateCmdPacket;
 import ru.dz.ccu825.pkt.CCU825SysInfoReqPacket;
 import ru.dz.ccu825.transport.ModBusConnection;
 import ru.dz.ccu825.util.CCU825CheckSumException;
@@ -41,6 +43,7 @@ public class CCU825Connection {
 	private CCU825DeviceInfo deviceInfo;
 
 	/**
+	 * Init a connection. Does nothing.
 	 * 
 	 * @param mc ModbBus connection implementation, used just for fn23 io
 	 * @param key communications encryption key. Contact radsel to get one. Have your device IMEI handy.
@@ -52,6 +55,12 @@ public class CCU825Connection {
 		this.key = key;
 	}
 
+	/**
+	 * Connect and do handshake as required by protocol.
+	 * @return handshake result.
+	 * @throws CCU825Exception in case of communications error or device malfunction
+	 */
+	
 	public CCU825ReturnCode connect() throws CCU825Exception
 	{
 		setupModBus();
@@ -121,7 +130,9 @@ public class CCU825Connection {
 	}
 
 	/**
-	 * Do an initial protocol transactions as defined in CCU825-SM protocol spec. from 5 September 2014, firmware ver. 01.02
+	 * Do an initial protocol transactions (handshake) as defined 
+	 * in CCU825-SM protocol spec. from 5 September 2014, firmware ver. 01.02
+	 * 
 	 * @return device return code
 	 * @throws CCU825Exception
 	 */
@@ -225,6 +236,7 @@ public class CCU825Connection {
 	}
 
 
+	// TODO LOGGER!
 
 	private void logErr(String string) {
 		System.err.println("Error: "+ string );		
@@ -257,16 +269,18 @@ public class CCU825Connection {
 	}
 
 
-	// TODO OutState
-	public int setOutState( int state, int mask )
+	/**
+	 * Does a request to change outputs
+	 * @return actual out state from device
+	 * @throws CCU825ProtocolException
+	 */
+	public int setOutState( int state, int mask ) throws CCU825ProtocolException
 	{
-		//CCU825Packet rp = exchange(new CCU825OutStateCmdPacket() );
-		//return new CCU825OutState(rp.getPacketPayload());
-		
-		return 0;
+		CCU825Packet rp = exchange(new CCU825OutStateCmdPacket( state, mask ) );
+		return new CCU825OutState(rp.getPacketPayload()).getOutBits();
 	}
 	
-	public int getOutState(  )
+	public int getOutState(  ) throws CCU825ProtocolException
 	{
 		return setOutState( 0, 0 ); // Mask of zeros = modify none
 	}

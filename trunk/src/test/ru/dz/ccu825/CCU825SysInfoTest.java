@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import ru.dz.ccu825.payload.CCU825DeviceInfo;
 import ru.dz.ccu825.payload.CCU825SysInfo;
 import ru.dz.ccu825.util.CCU825PacketFormatException;
 

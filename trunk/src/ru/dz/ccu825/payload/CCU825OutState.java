@@ -7,6 +7,12 @@ import ru.dz.ccu825.CCU825Packet;
 import ru.dz.ccu825.pkt.CCU825OutStateCmdPacket;
 import ru.dz.ccu825.util.CCU825PacketFormatException;
 
+/**
+ * OutState payload decoder
+ * @author dz
+ *
+ */
+
 public class CCU825OutState {
 
 	

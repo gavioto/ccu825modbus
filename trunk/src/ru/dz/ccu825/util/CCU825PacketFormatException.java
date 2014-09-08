@@ -1,7 +1,18 @@
 package ru.dz.ccu825.util;
 
+/**
+ * Thrown if packet with a wrong format or unexpected packet type is received
+ * @author dz
+ *
+ */
+
 
 public class CCU825PacketFormatException extends CCU825ProtocolException {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2300204512620994535L;
 
 	public CCU825PacketFormatException() {
 		// TODO Auto-generated constructor stub

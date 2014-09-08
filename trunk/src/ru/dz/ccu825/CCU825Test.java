@@ -55,6 +55,12 @@ public class CCU825Test {
 
 	public static void dumpBytes(String string, byte[] b) 
 	{
+		if( b==null )
+		{
+			System.err.println(string + ", null array " );
+			return;
+		}
+		
 		System.err.println(string + ", len = " + b.length);
 		
 		int p = 0;

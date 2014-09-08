@@ -1,6 +1,18 @@
 package ru.dz.ccu825.util;
 
+/**
+ * Common class for all CCU825 library exceptions.
+ * @author dz
+ *
+ */
+
+
 public class CCU825Exception extends Exception {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1448322018088722728L;
 
 	public CCU825Exception() {
 		// TODO Auto-generated constructor stub
