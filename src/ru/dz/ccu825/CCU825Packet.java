@@ -31,6 +31,7 @@ public class CCU825Packet {
 	public static final byte PKT_TYPE_DEVICEINFO = 0x02;
 	public static final byte PKT_TYPE_SYSINFO = 0x03;
 	public static final byte PKT_TYPE_EVENTS = 0x04;
+	public static final byte PKT_TYPE_PARTITIONSTATE = 0x05;
 	public static final byte PKT_TYPE_OUTSTATE = 0x06;
 
 	// REQUESTS
@@ -42,6 +43,7 @@ public class CCU825Packet {
 	public static final byte PKT_TYPE_DEVICEINFO_SUBREQ = 0x01;
 	public static final byte PKT_TYPE_SYSINFO_SUBREQ = 0x00;
 	public static final byte PKT_TYPE_OUTSTATE_SUBREQ = 0x03;
+	public static final byte PKT_TYPE_PARTITIONSTATE_SUBREQ = 0x02;
 	
 
 	
