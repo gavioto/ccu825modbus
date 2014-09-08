@@ -26,7 +26,7 @@ public class CCU825OutStateTest {
 
 		CCU825OutState os = new CCU825OutState( pl );
 		
-		System.err.println(os);
+		//System.err.println(os);
 		
 		assertEquals( os.toString(), "Out bits 39");
 		

@@ -257,5 +257,18 @@ public class CCU825Connection {
 	}
 
 
+	// TODO OutState
+	public int setOutState( int state, int mask )
+	{
+		//CCU825Packet rp = exchange(new CCU825OutStateCmdPacket() );
+		//return new CCU825OutState(rp.getPacketPayload());
+		
+		return 0;
+	}
+	
+	public int getOutState(  )
+	{
+		return setOutState( 0, 0 ); // Mask of zeros = modify none
+	}
 
 }
