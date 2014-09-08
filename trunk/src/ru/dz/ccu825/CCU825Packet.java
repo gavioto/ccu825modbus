@@ -1,5 +1,14 @@
 package ru.dz.ccu825;
 
+import ru.dz.ccu825.util.CRC16;
+
+/**
+ * Represents CCU825-SM protocol packet. Does assembly/disassembly.
+ * 
+ * @author dz
+ *
+ */
+
 public class CCU825Packet {
 
 	private static final int PKT_MAX_PAYLOAD = 1545;
@@ -11,18 +20,30 @@ public class CCU825Packet {
 	public static final byte PKT_FLAG_SYN = 0x02;
 	public static final byte PKT_FLAG_ACK = 0x04;
 
-	public static final byte PKT_TYPE_EMPTY = 0x00;
+
+	// Answers
+	public static final byte PKT_TYPE_RETCODE = 0x01; // ANSWER
 	
+	public static final byte PKT_TYPE_EMPTY = 0x00;
+
 	public static final byte PKT_TYPE_DEVICEINFOREQ = 0x01;
 	public static final byte PKT_TYPE_DEVICEINFO = 0x02; // ANSWER
 
-	public static final byte PKT_TYPE_RETCODE = 0x01; // ANSWER
+	public static final byte PKT_TYPE_SYSINFO = 03;
 
 	
 
 	private byte[] data;
 	private byte[] payload;
 	
+	/**
+	 * Construct packet object from raw protol data received from modbus io transaction.
+	 * 
+	 * @param data What we've got from modbus fn23 
+	 * 
+	 * @throws CCU825CheckSumException
+	 * @throws CCU825PacketFormatException
+	 */
 	
 	public CCU825Packet( byte [] data ) throws CCU825CheckSumException, CCU825PacketFormatException {
 		if( data.length < PKT_HEADER_LEN )
@@ -35,24 +56,37 @@ public class CCU825Packet {
 		checkCheckSum( data );
 		
 		payload = new byte[plen];
+		System.arraycopy(data, PKT_HEADER_LEN, payload, 0, plen);
 		
 		this.data = data;
 	}
 
 
 
+	/**
+	 * Get raw packet to send to modbus fn23.
+	 * @return packet bytes.
+	 */
 
 	public byte[] getPacketBytes() {
 		return data;
 	}
 
 
+	/**
+	 * Get packet payload data (offset 8).
+	 * @return Payload bytes.
+	 */
+	
 	public byte[] getPacketPayload() {
 		return payload;
 	}
 	
 	
-	
+	/**
+	 * Set packet's SYN header flag.
+	 * @param b set or reset
+	 */
 	
 	public void setSyn(boolean b) {
 		if( b )
@@ -61,10 +95,18 @@ public class CCU825Packet {
 			data[1] &= ~PKT_FLAG_SYN;
 	}
 	
+	/**
+	 * @return True if packet header has SYN flag.
+	 */
+	
 	public boolean isSyn() {
 		return (data[1] & PKT_FLAG_SYN) != 0;
 	}
 
+	/**
+	 * @return True if packet header has ACK flag.
+	 */
+	
 	public boolean isAck() {
 		return (data[1] & PKT_FLAG_ACK) != 0;
 	}
@@ -73,7 +115,13 @@ public class CCU825Packet {
 	
 	
 	
-	
+	/**
+	 * Check if packet length field is correct. 
+	 * 
+	 * @param data Packet data bytes
+	 * @return Actual payload length
+	 * @throws CCU825PacketFormatException Length value is insane
+	 */
 	
 	private int checkLen(byte[] data) throws CCU825PacketFormatException  {
 		
@@ -85,14 +133,18 @@ public class CCU825Packet {
 		
 		int recvLen = (rlh << 8) | rll; 
 		
-		// TODO allow for actual > calc?
-		if( recvLen+8 != data.length )
+		if( recvLen+8 < data.length )
 			throw new CCU825PacketFormatException("got " + recvLen+8 + "len in pkt, actual "+ data.length);
 		
 		return recvLen;
 	}
 	
-	
+	/**
+	 * Check if packet checksum is correct.
+	 * NB! Clears checksum bytes in packet!
+	 * @param data Packet data.
+	 * @throws CCU825CheckSumException Checksum was wrong.
+	 */
 	
 	private void checkCheckSum(byte[] data) throws CCU825CheckSumException {
 		int rcl = data[4];
@@ -113,11 +165,7 @@ public class CCU825Packet {
 	}
 
 	private int makeCheckSum(byte[] data) {
-		int ret = 0;
-		// TODO Auto-generated method stub
-		
-		
-		return ret & 0xFFFF;
+		return CRC16.crc(data) & 0xFFFF; // Make sure int has just 16 bits
 	}
 	
 	
@@ -137,6 +185,8 @@ public class CCU825Packet {
 		byte[] out = new byte[outSize];
 		
 		System.arraycopy(payload, 0, out, PKT_HEADER_LEN, payload.length);
+		
+		// TODO little endian! 
 		
 		out[0] = 0x01;
 		out[1] = flags;

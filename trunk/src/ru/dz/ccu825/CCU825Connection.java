@@ -1,5 +1,7 @@
 package ru.dz.ccu825;
 
+import ru.dz.ccu825.payload.CCU825DeviceInfo;
+
 /**
  * 
  * @author dz
@@ -23,6 +25,8 @@ public class CCU825Connection {
 	private int currentAck = 0;
 
 	private int lastRecvSeq;
+
+	private CCU825DeviceInfo deviceInfo;
 
 	/**
 	 * 
@@ -156,10 +160,15 @@ public class CCU825Connection {
 			try {
 				CCU825Packet rp = exchange(new CCU825DeviceInfoReqPacket() );
 
+				/*
 				byte[] rdata = rp.getPacketBytes();
 
 				if( rdata[0] != CCU825Packet.PKT_TYPE_DEVICEINFO )
 					logErr("wrong packet type" + rdata[0] );
+
+				*/
+				
+				deviceInfo = new CCU825DeviceInfo(rp.getPacketPayload());
 
 				// TODO store devinfo 
 				// TODO process/print devinfo here
@@ -219,6 +228,10 @@ public class CCU825Connection {
 	public void getSysInfo() {
 		// TODO Auto-generated method stub
 
+	}
+
+	public CCU825DeviceInfo getDeviceInfo() {
+		return deviceInfo;
 	}
 
 
