@@ -1,5 +1,8 @@
 package ru.dz.ccu825;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 import ru.dz.ccu825.util.CRC16;
 
 /**
@@ -55,8 +58,14 @@ public class CCU825Packet {
 		if( data[0] != 0x01 )
 			throw new CCU825PacketFormatException("Wrong header byte");
 		
-		int plen = checkLen(data);		
-		checkCheckSum( data );
+		ByteBuffer bb = ByteBuffer.wrap(data);
+		bb.order(ByteOrder.LITTLE_ENDIAN);
+
+		short pktLen = bb.getShort(6);
+		short pktCs = bb.getShort(4);
+		
+		int plen = checkLen(data, pktLen );		
+		checkCheckSum( data, pktCs );
 		
 		payload = new byte[plen];
 		System.arraycopy(data, PKT_HEADER_LEN, payload, 0, plen);
@@ -122,12 +131,14 @@ public class CCU825Packet {
 	 * Check if packet length field is correct. 
 	 * 
 	 * @param data Packet data bytes
+	 * @param recvLen 
 	 * @return Actual payload length
 	 * @throws CCU825PacketFormatException Length value is insane
 	 */
 	
-	private int checkLen(byte[] data) throws CCU825PacketFormatException  {
+	private int checkLen(byte[] data, short recvLen) throws CCU825PacketFormatException  {
 		
+		/*
 		int rll = data[6];
 		int rlh = data[7];
 		
@@ -135,7 +146,7 @@ public class CCU825Packet {
 		rlh &= 0xFF;
 		
 		int recvLen = (rlh << 8) | rll; 
-		
+		*/
 		if( recvLen+8 < data.length )
 			throw new CCU825PacketFormatException("got " + recvLen+8 + "len in pkt, actual "+ data.length);
 		
@@ -146,10 +157,12 @@ public class CCU825Packet {
 	 * Check if packet checksum is correct.
 	 * NB! Clears checksum bytes in packet!
 	 * @param data Packet data.
+	 * @param recvCheckSum 
 	 * @throws CCU825CheckSumException Checksum was wrong.
 	 */
 	
-	private void checkCheckSum(byte[] data) throws CCU825CheckSumException {
+	private void checkCheckSum(byte[] data, short recvCheckSum) throws CCU825CheckSumException {
+		/*
 		int rcl = data[4];
 		int rch = data[5];
 		
@@ -157,6 +170,8 @@ public class CCU825Packet {
 		rch &= 0xFF;
 		
 		int recvCheckSum = (rch << 8) | rcl; 
+		*/
+		
 		
 		data[4] = 0;
 		data[5] = 0;
@@ -189,7 +204,9 @@ public class CCU825Packet {
 		
 		System.arraycopy(payload, 0, out, PKT_HEADER_LEN, payload.length);
 		
-		// TODO little endian! 
+		ByteBuffer bb = ByteBuffer.wrap(out);
+		bb.order(ByteOrder.LITTLE_ENDIAN);
+
 		
 		out[0] = 0x01;
 		out[1] = flags;
@@ -200,13 +217,15 @@ public class CCU825Packet {
 		out[4] = 0; // csum  
 		out[5] = 0; //   
 
-		out[6] = (byte) ( payload.length & 0xFF );  
-		out[7] = (byte) ((payload.length >> 8) & 0xFF );    		
+		//out[6] = (byte) ( payload.length & 0xFF );  
+		//out[7] = (byte) ((payload.length >> 8) & 0xFF );    		
+		bb.putShort(6, (short)payload.length);
 		
 		int calcCheckSum = makeCheckSum(out);
 		
-		out[4] = (byte) ( calcCheckSum & 0xFF );  
-		out[5] = (byte) ((calcCheckSum >> 8) & 0xFF );    		
+		//out[4] = (byte) ( calcCheckSum & 0xFF );  
+		//out[5] = (byte) ((calcCheckSum >> 8) & 0xFF );    		
+		bb.putShort(4, (short)calcCheckSum);
 		
 		
 		data = out;
