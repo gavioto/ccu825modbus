@@ -1,4 +1,5 @@
-package ru.dz.ccu825;
+package ru.dz.ccu825.transport;
+
 
 public class ProxyModbus implements ModBusConnection {
 

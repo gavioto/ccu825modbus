@@ -1,5 +1,11 @@
 package ru.dz.ccu825;
 
+import ru.dz.ccu825.payload.CCU825ReturnCode;
+import ru.dz.ccu825.transport.ModBusConnection;
+import ru.dz.ccu825.transport.ProxyModbus;
+import ru.dz.ccu825.util.CCU825Exception;
+import ru.dz.ccu825.util.CCU825ProtocolException;
+
 public class CCU825Test {
 
 	public CCU825Test() {

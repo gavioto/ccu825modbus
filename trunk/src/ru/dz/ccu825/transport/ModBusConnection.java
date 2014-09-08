@@ -1,4 +1,4 @@
-package ru.dz.ccu825;
+package ru.dz.ccu825.transport;
 
 public interface ModBusConnection {
 		public void setSpeed( int baud );

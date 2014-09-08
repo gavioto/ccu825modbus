@@ -1,8 +1,8 @@
 package ru.dz.ccu825.pkt;
 
-import ru.dz.ccu825.CCU825CheckSumException;
 import ru.dz.ccu825.CCU825Packet;
-import ru.dz.ccu825.CCU825PacketFormatException;
+import ru.dz.ccu825.util.CCU825CheckSumException;
+import ru.dz.ccu825.util.CCU825PacketFormatException;
 
 public class CCU825OutStateCmdPacket extends CCU825Packet {
 	
