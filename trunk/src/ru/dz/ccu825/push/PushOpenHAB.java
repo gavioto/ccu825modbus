@@ -13,9 +13,15 @@ import ru.dz.ccu825.payload.CCU825SysInfo;
 
 public class PushOpenHAB {
 
-	private String openHABHostName = "localhost";
+	private final String openHABHostName;
+	//private String openHABHostName = "localhost";
 
-	public PushOpenHAB(String openHABHostName ) {
+	private String chargeItemName;
+
+	
+	
+	
+	public PushOpenHAB( String openHABHostName ) {
 		this.openHABHostName = openHABHostName;
 	}
 
@@ -42,6 +48,14 @@ public class PushOpenHAB {
 
 			sendValue( name, Double.toString( si.getInValue()[i] ) );
 		}
+		
+		if(chargeItemName != null) sendValue( chargeItemName, Byte.toString( si.getBatteryPercentage() ) );
+		
+		sendValue( "CCU825_Device_Temperature", Byte.toString( si.getDeviceTemperature() ) );
+		sendValue( "CCU825_Power_Voltage", Double.toString( si.getPowerVoltage() ) );
+
+		if( si.isBalanceValid() ) 
+			sendValue( "CCU825_GSM_Balance", Double.toString( si.getGSMBalance() ) );
 	}
 
 
@@ -79,5 +93,33 @@ public class PushOpenHAB {
 		return new URL("http", openHABHostName, 8080, String.format("CMD?%s=%s ", openHABHostName, name, value ) );
 		//return new URL( String.format("http://%s:8080/CMD?%s=%s ", openHABHostName, name, value ) );
 	}
+
+
+	public void setDefaultItemNames() 
+	{
+		for( int i = 0; i < CCU825SysInfo.N_IN; i++ )
+		{
+			setInputItemName(i, String.format( "CCU825_In%d", i) );
+		}
+		
+		chargeItemName = "CCU825_Battery_Charge";
+	}
+
+
+	public String getOpenHABHostName() {
+		return openHABHostName;
+	}
+	
+	
+	public String getChargeItemName() {
+		return chargeItemName;
+	}
+
+
+	public void setChargeItemName(String chargeItemName) {
+		this.chargeItemName = chargeItemName;
+	}
+
+
 
 }
