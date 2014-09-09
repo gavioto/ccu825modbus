@@ -1,5 +1,9 @@
 package ru.dz.ccu825.data;
 
+import java.util.logging.Logger;
+
+import ru.dz.ccu825.CCU825Connection;
+
 /**
  * Represents state of a guard zone (partition) = what CCU does for that zone: 
  * <ul>
@@ -23,6 +27,9 @@ public enum GuardState {
 	Disarm,
 	Protect,
 	Arm;
+	
+	private static final Logger log = Logger.getLogger(GuardState.class.getName()); 
+
 	
 	/**
 	 * Convert to bits for a PartitionStateCmd packet payload
@@ -56,7 +63,9 @@ public enum GuardState {
 			case 1: return Arm;
 			case 2: return Protect;
 			
-			default: return Arm; // TODO make noise 
+			default:
+				log.severe("Unknown GuardState value in fromStateBits()!");
+				return Arm;  
 		}
 	}
 }

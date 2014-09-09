@@ -8,9 +8,6 @@ import ru.dz.ccu825.util.CCU825ProtocolException;
 
 public class CCU825Test {
 
-	public CCU825Test() {
-		// TODO Auto-generated constructor stub
-	}
 
 	/**
 	 * @param args
@@ -26,12 +23,13 @@ public class CCU825Test {
 		try {
 		
 			CCU825ReturnCode protocolRC = c.connect();
-			System.out.print("RC = " + protocolRC ); // TODO move out
-					
-			c.getSysInfo();
+			System.out.print("RC = " + protocolRC );
+			
+			System.out.println( c.getDeviceInfo() );
+			
+			//System.out.println( c.getSysInfo() );
 			
 		} catch (CCU825Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;
 		}
@@ -44,7 +42,6 @@ public class CCU825Test {
 			try {
 				System.out.println(c.getSysInfo());
 			} catch (CCU825ProtocolException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}			
 		}

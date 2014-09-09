@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import ru.dz.ccu825.CCU825Test;
 import ru.dz.ccu825.util.CCU825Exception;
+import ru.dz.ccu825.util.CCU825ProtocolException;
 
 import com.ghgande.j2mod.modbus.Modbus;
 import com.ghgande.j2mod.modbus.ModbusException;
@@ -81,10 +82,21 @@ public class CCU825_j2mod_connector implements ModBusConnection {
 	}
 
 	@Override
-	public byte[] rwMultiple(int nRead, byte[] writeData) throws CCU825Exception {
+	public byte[] rwMultiple(int nRead, byte[] writeData) throws CCU825ProtocolException 
+	{
 
+		if( (writeData.length & 1) != 0 )
+		{
+			//System.err.println("odd packet size, byte lost!");
+			byte[] replacement = new byte[writeData.length+1];
+			
+			replacement[replacement.length-1] = 0;
+			System.arraycopy(writeData, 0, replacement, 0, writeData.length);
+			
+			writeData = replacement;
+		}
 		
-		// TODO recreate write count from send data size
+		
 		CCU825_ReadWriteMultipleRequest req = new CCU825_ReadWriteMultipleRequest( nRead, writeData.length/2 );
 		
 		req.setUnitID(0);	
@@ -105,7 +117,7 @@ public class CCU825_j2mod_connector implements ModBusConnection {
 		try {
 			trans.execute();
 		} catch (ModbusException x) {			
-			throw new CCU825Exception(x);
+			throw new CCU825ProtocolException(x);
 		}
 
 
@@ -120,7 +132,7 @@ public class CCU825_j2mod_connector implements ModBusConnection {
 		
 		if (res instanceof ExceptionResponse) {
 			ExceptionResponse exception = (ExceptionResponse) res;
-			throw new CCU825Exception(exception.toString());
+			throw new CCU825ProtocolException(exception.toString());
 		}
 		
 		//if (! (res instanceof ReadMultipleRegistersResponse))			return;

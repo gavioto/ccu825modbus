@@ -40,9 +40,14 @@ public class CCU825DeviceInfoTest {
 		assertEquals(0x02, di.getVerFirmWare() );
 		assertEquals(0x03, di.getVerBootLoader() );
 		
-		// TODO strings
 		
-		//fail("Not yet implemented");
+		assertEquals("RUS", di.getLang());
+		assertEquals("49-015420-323751", di.getIMEI());
+		assertEquals("08 Sep 2014", di.getFirmWareBuildDate());
+		assertEquals("CCU825", di.getDevType());
+		assertEquals("-SM", di.getDevMod());
+		
+		
 	}
 
 	private void fillZeroTerm(byte[] pl, int start, int len, String string) {

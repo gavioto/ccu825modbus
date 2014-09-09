@@ -1,8 +1,6 @@
 package ru.dz.ccu825.util;
 
-// got fro0m http://stackoverflow.com/questions/12289717/rc4-encryption-java
-
-// TODO unit test http://tools.ietf.org/html/rfc6229
+// got from http://stackoverflow.com/questions/12289717/rc4-encryption-java
 
 public class RC4 {
 

@@ -298,7 +298,7 @@ public class J2Mod_read_holding_test {
 		// 3. Create the command.
 		//req = new ReadMultipleRegistersRequest(ref, count);
 		
-		// TODO recreate write count from send data size
+
 		CCU825_ReadWriteMultipleRequest req = new CCU825_ReadWriteMultipleRequest(2, sd.length/2 );
 		
 		req.setUnitID(0);
