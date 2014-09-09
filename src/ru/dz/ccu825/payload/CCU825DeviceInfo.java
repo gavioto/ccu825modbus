@@ -24,6 +24,8 @@ public class CCU825DeviceInfo {
 	private final short verFirmWare;
 	private final short verBootLoader;
 
+	private final byte[] serialNumber = new byte[16];
+	
 	/**
 	 * Construct from packet data
 	 * @param in Packet payload binary data
@@ -51,8 +53,7 @@ public class CCU825DeviceInfo {
 		verFirmWare = bb.getShort(21);
 		verBootLoader = bb.getShort(23);
 
-		// TODO S/N
-		
+		System.arraycopy(in, 41, serialNumber, 0, serialNumber.length);		
 	}
 
 	
@@ -96,6 +97,11 @@ public class CCU825DeviceInfo {
 
 	public short getVerBootLoader() {
 		return verBootLoader;
+	}
+
+
+	public byte[] getSerialNumber() {
+		return serialNumber;
 	}
 	
 }

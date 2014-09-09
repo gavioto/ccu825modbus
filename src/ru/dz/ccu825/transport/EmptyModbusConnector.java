@@ -6,7 +6,7 @@ package ru.dz.ccu825.transport;
  *
  */
 
-public class ProxyModbus implements ModBusConnection {
+public class EmptyModbusConnector implements ModBusConnection {
 
 	@Override
 	public void setSpeed(int baud) {

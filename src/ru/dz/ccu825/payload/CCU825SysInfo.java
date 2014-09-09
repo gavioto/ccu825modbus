@@ -16,7 +16,7 @@ import ru.dz.ccu825.util.CCU825PacketFormatException;
 public class CCU825SysInfo {
 
 	
-	private static final int N_IN = 8;
+	public static final int N_IN = 8;
 	
 	
 	private final byte inBits;
