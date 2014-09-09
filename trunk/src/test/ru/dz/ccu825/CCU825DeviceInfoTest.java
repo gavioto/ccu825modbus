@@ -9,26 +9,34 @@ import ru.dz.ccu825.util.CCU825PacketFormatException;
 
 public class CCU825DeviceInfoTest {
 
+	private static final String languageTestValue = "RUS";
+	private static final String imeiTestValue = "49-015420-323751";
+	private static final String deviceModificationTestValue = "-SM";
+	private static final String deviceTypeTestValue = "CCU825";
+	private static final String dateTestValue = "08 Sep 2014";
+	private static final byte[] snTestValue = { 0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0 };
+
 	@Test
 	public void testCCU825DeviceInfo() throws CCU825PacketFormatException {
 		
 		byte[] pl = new byte[76];
 		
+		
 		pl[0] = 0x02;
 		
-		fillZeroTerm( pl, 1, 8, "CCU825" );
-		fillZeroTerm( pl, 10, 8, "-SM" );
+		fillZeroTerm( pl, 1, 8, deviceTypeTestValue );
+		fillZeroTerm( pl, 10, 8, deviceModificationTestValue );
 		
 		pl[19] = 0x01;
 		pl[21] = 0x02;
 		pl[23] = 0x03;
 		
-		fillZeroTerm( pl, 25, 12, "08 Sep 2014" ); // TODO date format
-		fillZeroTerm( pl, 37, 4, "RUS" );
+		fillZeroTerm( pl, 25, 12, dateTestValue ); // TODO date format
+		fillZeroTerm( pl, 37, 4, languageTestValue );
 
-		fillZeroTerm( pl, 57, 16, "49-015420-323751" ); // IMEI
+		fillZeroTerm( pl, 57, 16, imeiTestValue ); // IMEI
 
-		// TODO S/N
+		System.arraycopy(snTestValue, 0, pl, 41, snTestValue.length);
 		
 		CCU825DeviceInfo di = new CCU825DeviceInfo(pl);
 		
@@ -41,11 +49,13 @@ public class CCU825DeviceInfoTest {
 		assertEquals(0x03, di.getVerBootLoader() );
 		
 		
-		assertEquals("RUS", di.getLang());
-		assertEquals("49-015420-323751", di.getIMEI());
-		assertEquals("08 Sep 2014", di.getFirmWareBuildDate());
-		assertEquals("CCU825", di.getDevType());
-		assertEquals("-SM", di.getDevMod());
+		assertEquals(languageTestValue, di.getLang());
+		assertEquals(imeiTestValue, di.getIMEI());
+		assertEquals(dateTestValue, di.getFirmWareBuildDate());
+		assertEquals(deviceTypeTestValue, di.getDevType());
+		assertEquals(deviceModificationTestValue, di.getDevMod());
+		
+		assertArrayEquals( snTestValue, di.getSerialNumber() );
 		
 		
 	}
