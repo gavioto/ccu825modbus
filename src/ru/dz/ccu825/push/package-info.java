@@ -5,6 +5,5 @@
  * @author dz
  *
  *
- * TODO poll openHub https://github.com/Atmosphere/atmosphere
  */
 package ru.dz.ccu825.push;

@@ -11,9 +11,9 @@ public class CCU825DeviceInfoTest {
 
 	private static final String languageTestValue = "RUS";
 	private static final String imeiTestValue = "49-015420-323751";
-	private static final String deviceModificationTestValue = "-SM";
+	private static final String deviceModificationTestValue = "SM";
 	private static final String deviceTypeTestValue = "CCU825";
-	private static final String dateTestValue = "08 Sep 2014";
+	private static final String dateTestValue = "Sep 08 2014";
 	private static final byte[] snTestValue = { 0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0 };
 
 	@Test
@@ -31,7 +31,7 @@ public class CCU825DeviceInfoTest {
 		pl[21] = 0x02;
 		pl[23] = 0x03;
 		
-		fillZeroTerm( pl, 25, 12, dateTestValue ); // TODO date format
+		fillZeroTerm( pl, 25, 12, dateTestValue ); 
 		fillZeroTerm( pl, 37, 4, languageTestValue );
 
 		fillZeroTerm( pl, 57, 16, imeiTestValue ); // IMEI
@@ -42,7 +42,7 @@ public class CCU825DeviceInfoTest {
 		
 		//System.err.println(di);
 		
-		assertEquals( di.toString(), "Controller CCU825 modification -SM HW 1 FW 2 (08 Sep 2014) BL 3 language is RUS IMEI=49-015420-323751");
+		assertEquals( di.toString(), "Controller CCU825 modification SM HW 1 FW 2 (Sep 08 2014) BL 3 language is RUS IMEI=49-015420-323751");
 		
 		assertEquals(0x01, di.getVerHardWare() );
 		assertEquals(0x02, di.getVerFirmWare() );

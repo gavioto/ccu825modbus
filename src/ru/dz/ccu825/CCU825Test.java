@@ -1,7 +1,10 @@
 package ru.dz.ccu825;
 
+import java.util.logging.Logger;
+
 import ru.dz.ccu825.payload.CCU825ReturnCode;
 import ru.dz.ccu825.payload.CCU825SysInfo;
+import ru.dz.ccu825.push.PollOpenHAB;
 import ru.dz.ccu825.push.PushOpenHAB;
 import ru.dz.ccu825.transport.ModBusConnection;
 import ru.dz.ccu825.transport.EmptyModbusConnector;
@@ -9,6 +12,7 @@ import ru.dz.ccu825.util.CCU825Exception;
 import ru.dz.ccu825.util.CCU825ProtocolException;
 
 public class CCU825Test {
+	private final static Logger log = Logger.getLogger(CCU825Test.class.getName());
 
 
 	/**

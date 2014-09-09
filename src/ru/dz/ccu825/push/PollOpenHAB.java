@@ -8,13 +8,25 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import ru.dz.ccu825.CCU825Connection;
 import ru.dz.ccu825.pkt.CCU825OutStateCmdPacket;
-import ru.dz.ccu825.util.CCU825ProtocolException;
 
+/*
+ * poll openHub - possibly use https://github.com/Atmosphere/atmosphere
+ */
+
+/**
+ * 
+ * Poll OpenHAB for item data, translate to CCU825 outputs (or some other place)
+ * 
+ * @author dz
+ *
+ */
 public class PollOpenHAB {
-
+	private final static Logger log = Logger.getLogger(PollOpenHAB.class.getName());
+	
 	private Map<String,PollItemHandler> items = new HashMap<String,PollItemHandler>();
 	private String openHABHostName;
 	private CCU825Connection conn;
@@ -24,6 +36,11 @@ public class PollOpenHAB {
 		this.conn = conn;
 	}
 	
+	/**
+	 * Add Item to be polled and processed by given PollItemHandler
+	 * @param name item name
+	 * @param h handler to pass item value to
+	 */
 	void addItem(String name, PollItemHandler h)
 	{
 		items.put(name,h);
@@ -31,7 +48,7 @@ public class PollOpenHAB {
 
 	
 	/**
-	 * Polls item and does nothing
+	 * Add Item to be polled and written nowhere
 	 * @param name item name
 	 */
 	public void addVoidItem(String name)
@@ -41,7 +58,8 @@ public class PollOpenHAB {
 	}
 	
 	/**
-	 * Polls item and sets/resets CCU825 output bit accordingly
+	 * Add (boolean) Item to be polled and written to CCU825 output bit
+	 * 
 	 * @param name
 	 * @param nBit
 	 */
@@ -49,7 +67,7 @@ public class PollOpenHAB {
 	{
 		if( (nBit > CCU825OutStateCmdPacket.N_OUT_BITS) || (nBit < 0) )
 		{
-			// TODO err
+			log.severe("addBitItem bit n="+nBit);
 			return;
 		}
 		
@@ -57,7 +75,19 @@ public class PollOpenHAB {
 		items.put(name,h);
 	}
 	
+	/**
+	 * Forget item, don't poll for it any more
+	 * @param itemName
+	 * @return null or handler that was registered for named item
+	 */
+	public PollItemHandler removeItem(String itemName)
+	{
+		return items.remove(itemName);
+	}
 	
+	/**
+	 * Poll OpehHAB for all registered items.
+	 */
 	
 	public void doPoll()
 	{
@@ -70,6 +100,11 @@ public class PollOpenHAB {
 		}
 	}
 
+	/**
+	 * Ask OpenHAB for named item's value
+	 * @param item item name
+	 * @return item value or null if error occurred
+	 */
 	private String getValue(String item) {
 		try
 		{
@@ -80,21 +115,32 @@ public class PollOpenHAB {
 		}
 		catch(IOException e)
 		{
-			// TODO log
-			e.printStackTrace();
+			// e.printStackTrace();
+			log.severe(e.getMessage());
 			return null;
 		}
 	}
 
+	/**
+	 * Create URL for reading item value
+	 * @param name item name
+	 * @return URL to connect to and read value
+	 * @throws MalformedURLException
+	 */
 	private URL makeUrl(String name) throws MalformedURLException 
 	{
 		return new URL("http", openHABHostName, 8080, String.format("/rest/items/%s/state", name ) );
 	}
 	
-	private String callUrl(URL url) throws IOException {
-
+	/**
+	 * Make (an http) call to URL, return answer collected
+	 * @param url URL to visit
+	 * @return Web page text
+	 * @throws IOException
+	 */
+	private String callUrl(URL url) throws IOException 
+	{
 		URLConnection yc = url.openConnection();
-
 
 		BufferedReader in = new BufferedReader(
 				new InputStreamReader(
@@ -115,48 +161,6 @@ public class PollOpenHAB {
 
 
 
-}
-
-
-abstract class PollItemHandler
-{
-
-	public abstract void transfer(String item, String value);
-
-}
-
-class EmptyPollItemHandler extends PollItemHandler
-{
-	@Override
-	public void transfer(String item, String value) {
-		// Ignore		
-	}
-}
-
-
-class OutBitPollItemHandler extends PollItemHandler
-{
-	private final int nOutBit;
-	private CCU825Connection conn;
-
-	/**
-	 * 
-	 * @param nOutBit CCU825 output number (bit pos)
-	 */
-	public OutBitPollItemHandler(int nOutBit, CCU825Connection conn) {
-		this.nOutBit = nOutBit;
-		this.conn = conn;
-	}
-	
-	@Override
-	public void transfer(String item, String value) {
-		try {
-			conn.setOutState(nOutBit, value.equalsIgnoreCase("ON"));
-		} catch (CCU825ProtocolException e) {
-			// TODO log
-			e.printStackTrace();
-		}		
-	}
 }
 
 
