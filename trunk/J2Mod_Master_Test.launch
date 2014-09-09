@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/ccu825modbus/src/ru/dz/ccu825/test/J2Mod_Master_Test.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="ru.dz.ccu825.test.J2Mod_Master_Test"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="127.0.0.1:502 base 0 count 2"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="ccu825modbus"/>
+</launchConfiguration>

@@ -2,6 +2,7 @@ package ru.dz.ccu825.payload;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.Charset;
 
 import ru.dz.ccu825.CCU825Packet;
 import ru.dz.ccu825.util.CCU825PacketFormatException;
@@ -40,14 +41,22 @@ public class CCU825DeviceInfo {
 		if( in[0] != CCU825Packet.PKT_TYPE_DEVICEINFO )
 			throw new CCU825PacketFormatException("Wrong DeviceInfo payload header byte");
 		
-		devType = new String( in, 0, 1, 8 ).trim();
-		devMod = new String( in, 0, 10, 8 ).trim();
+		// String(byte bytes[], int offset, int length, Charset charset)
 
-		firmWareBuildDate = new String( in, 0, 25, 12 ).trim();
+		Charset ascii = Charset.forName("ascii");
+		devType = new String( in, 1, 8, ascii ).trim();
+		devMod = new String( in, 10, 8, ascii ).trim();
 
-		lang = new String( in, 0, 37, 4 ).trim();
+		//devType = new String( in, 0, 1, 8 ).trim();
+		//devMod = new String( in, 0, 10, 8 ).trim();
 
-		IMEI = new String( in, 0, 57, 16 ).trim();
+		firmWareBuildDate = new String( in, 25, 12, ascii ).trim();
+		lang = new String( in, 37, 4, ascii ).trim();
+		IMEI = new String( in, 57, 16, ascii ).trim();
+
+		//firmWareBuildDate = new String( in, 0, 25, 12 ).trim();
+		//lang = new String( in, 0, 37, 4 ).trim();
+		//IMEI = new String( in, 0, 57, 16 ).trim();
 		
 		verHardWare = bb.getShort(19);
 		verFirmWare = bb.getShort(21);

@@ -8,7 +8,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
+import ru.dz.ccu825.CCU825Test;
 import ru.dz.ccu825.payload.CCU825SysInfo;
 
 /**
@@ -21,6 +23,7 @@ import ru.dz.ccu825.payload.CCU825SysInfo;
  */
 
 public class PushOpenHAB {
+	private final static Logger log = Logger.getLogger(PushOpenHAB.class.getName());
 
 	private final String openHABHostName;
 	//private String openHABHostName = "localhost";
@@ -74,26 +77,27 @@ public class PushOpenHAB {
 			callUrl(url);
 		} catch(IOException e)
 		{
-			// TODO log
-			e.printStackTrace();
+			log.severe(e.getMessage());
+			//e.printStackTrace();
 		}
 	}
 
 
-	private void callUrl(URL url) throws IOException {
-
+	private void callUrl(URL url) throws IOException 
+	{
 		URLConnection yc = url.openConnection();
 
-
 		BufferedReader in = new BufferedReader(
-				new InputStreamReader(
-						yc.getInputStream()));
+				new InputStreamReader(yc.getInputStream()));
+
 		String inputLine;
 
-		// TODO just for test
 		while ((inputLine = in.readLine()) != null) 
-			System.out.println(inputLine);
-
+		{
+			log.finest("callUrl="+inputLine);
+			//System.out.println(inputLine);
+		}
+		
 		in.close();
 	}
 
