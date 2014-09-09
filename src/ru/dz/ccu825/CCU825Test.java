@@ -1,6 +1,8 @@
 package ru.dz.ccu825;
 
 import ru.dz.ccu825.payload.CCU825ReturnCode;
+import ru.dz.ccu825.payload.CCU825SysInfo;
+import ru.dz.ccu825.push.PushOpenHAB;
 import ru.dz.ccu825.transport.ModBusConnection;
 import ru.dz.ccu825.transport.EmptyModbusConnector;
 import ru.dz.ccu825.util.CCU825Exception;
@@ -15,7 +17,10 @@ public class CCU825Test {
 	public static void main(String[] args) {				
 		
 		ModBusConnection mc = new EmptyModbusConnector();
+		PushOpenHAB oh = new PushOpenHAB("localhost");
 
+		oh.setDefaultItemNames();
+		
 		byte[] key = { 0x00, 0x00, 0x00, 0x00 };
 		
 		CCU825Connection c = new CCU825Connection(mc, key);
@@ -40,7 +45,9 @@ public class CCU825Test {
 		for( int i = 20; i > 0; i-- )
 		{
 			try {
-				System.out.println(c.getSysInfo());
+				CCU825SysInfo si = c.getSysInfo();
+				oh.sendSysInfo(si);
+				System.out.println(si);
 			} catch (CCU825ProtocolException e) {
 				e.printStackTrace();
 			}			
