@@ -1,5 +1,7 @@
 package ru.dz.ccu825;
 
+import java.util.logging.Logger;
+
 import ru.dz.ccu825.payload.CCU825DeviceInfo;
 import ru.dz.ccu825.payload.CCU825OutState;
 import ru.dz.ccu825.payload.CCU825ReturnCode;
@@ -79,12 +81,10 @@ public class CCU825Connection {
 	 * 
 	 * @param send Packet to send
 	 * @return Packet received
-	 * 
-	 * @throws CCU825CheckSumException Received packet had checksum error
-	 * @throws CCU825PacketFormatException Received packet was broken somehow else
+	 * @throws CCU825ProtocolException 
 	 */
 	
-	private CCU825Packet exchange( CCU825Packet send ) throws CCU825CheckSumException, CCU825PacketFormatException
+	private CCU825Packet exchange( CCU825Packet send ) throws CCU825ProtocolException
 	{
 		send.setSeqNum( currentSeq++ );
 		//send.setAckNum( currentAck );
@@ -101,7 +101,7 @@ public class CCU825Connection {
 		byte[] spd = enc.encrypt(packetBytes);
 
 		CCU825Test.dumpBytes( "modbus send", spd );
-		byte[] rcv = mc.rwMultiple(0, CCU825Packet.MAXPACKET, 0, writeBytes/2, writeBytes, spd);
+		byte[] rcv = mc.rwMultiple( CCU825Packet.MAXPACKET+1/2, spd );
 		CCU825Test.dumpBytes( "modbus recv", rcv );
 
 
@@ -181,21 +181,9 @@ public class CCU825Connection {
 		{
 
 			try {
-				CCU825Packet rp = exchange(new CCU825DeviceInfoReqPacket() );
-
-				/*
-				byte[] rdata = rp.getPacketBytes();
-
-				if( rdata[0] != CCU825Packet.PKT_TYPE_DEVICEINFO )
-					logErr("wrong packet type" + rdata[0] );
-
-				*/
-				
+				CCU825Packet rp = exchange(new CCU825DeviceInfoReqPacket() );		
 				deviceInfo = new CCU825DeviceInfo(rp.getPacketPayload());
-
-				// TODO store devinfo 
-				// TODO process/print devinfo here
-
+			
 			} catch( CCU825ProtocolException ex )
 			{
 				logProtoErr( ex );
@@ -236,14 +224,16 @@ public class CCU825Connection {
 	}
 
 
-	// TODO LOGGER!
+	private static final Logger log = Logger.getLogger(CCU825Connection.class.getName()); 
 
 	private void logErr(String string) {
-		System.err.println("Error: "+ string );		
+		//System.err.println("Error: "+ string );
+		log.severe(string);
 	}
 
 	private void logProtoErr(CCU825ProtocolException ex) {
-		System.err.println("Protocol err: "+ex.getMessage());		
+		//System.err.println("Protocol err: "+ex.getMessage());
+		log.severe("Protocol err: "+ex.getMessage());
 	}
 
 

@@ -1,24 +1,23 @@
 package ru.dz.ccu825.transport;
 
+/**
+ * Empty connector to test code with no comm at all.
+ * @author dz
+ *
+ */
 
 public class ProxyModbus implements ModBusConnection {
 
 	@Override
 	public void setSpeed(int baud) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void connect() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void disconnect() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
