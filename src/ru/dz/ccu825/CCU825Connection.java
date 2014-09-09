@@ -275,4 +275,15 @@ public class CCU825Connection {
 		return setOutState( 0, 0 ); // Mask of zeros = modify none
 	}
 
+	public void setOutState(int nOutBit, boolean state) throws CCU825ProtocolException 
+	{
+		int mask = (1 << nOutBit);
+		int bits = 0;
+		
+		if( state )
+			bits = mask;
+	
+		setOutState(bits, mask);
+	}
+
 }
