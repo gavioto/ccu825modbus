@@ -11,6 +11,15 @@ import java.util.Map;
 
 import ru.dz.ccu825.payload.CCU825SysInfo;
 
+/**
+ * Push data to OpenHAB instance with http requests.
+ * 
+ * TODO REST https://github.com/openhab/openhab/wiki/REST-API
+ * 
+ * @author dz
+ *
+ */
+
 public class PushOpenHAB {
 
 	private final String openHABHostName;
