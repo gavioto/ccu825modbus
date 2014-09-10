@@ -91,8 +91,8 @@ public class CCU825Connection {
 	private CCU825Packet exchange( CCU825Packet send ) throws CCU825ProtocolException
 	{
 		send.setSeqNum( currentSeq++ );
-		//send.setAckNum( currentAck );
-		send.setAckNum( lastRecvSeq );
+		send.setAckNum( currentAck );
+		//send.setAckNum( lastRecvSeq );
 
 		send.setEnc(encryptionEnabled);
 
@@ -102,18 +102,21 @@ public class CCU825Connection {
 
 		assert( (writeBytes & 1) == 0 );
 
-		byte[] spd;
 		if(encryptionEnabled)
 		{
-			RC4 enc = new RC4(key);
-			spd = enc.encrypt(packetBytes);
-			System.arraycopy(spd, 0, packetBytes, 0, 8); // header is unencrypted
-		}
-		else
-			spd = packetBytes;
+			byte[] payload = new byte[writeBytes-8];
+			System.arraycopy(packetBytes,8,payload,0,writeBytes-8);
 			
-		if( dataDumpEnabled ) CCU825Test.dumpBytes( "modbus send", spd );
-		byte[] rcv = mc.rwMultiple( CCU825Packet.MAXPACKET+1/2, spd );
+			RC4 enc = new RC4(key);
+			payload = enc.encrypt(payload);
+			
+			//spd = new byte[writeBytes];
+			System.arraycopy(payload, 0, packetBytes, 8, writeBytes-8);
+		}
+
+
+		if( dataDumpEnabled ) CCU825Test.dumpBytes( "modbus send", packetBytes );
+		byte[] rcv = mc.rwMultiple( CCU825Packet.MAXPACKET+1/2, packetBytes );
 		if( dataDumpEnabled) CCU825Test.dumpBytes( "modbus recv", rcv );
 
 
@@ -231,7 +234,7 @@ public class CCU825Connection {
 			try {
 				CCU825Packet rp = exchange(new CCU825DeviceInfoAckPacket() );
 
-				byte[] rdata = rp.getPacketBytes();
+				byte[] rdata = rp.getPacketPayload();
 
 				if( rdata[0] != CCU825Packet.PKT_TYPE_RETCODE )
 					logErr("wrong packet type" + rdata[0] );
