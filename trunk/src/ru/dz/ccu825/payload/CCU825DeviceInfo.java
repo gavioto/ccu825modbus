@@ -70,8 +70,8 @@ public class CCU825DeviceInfo {
 	public String toString() {
 		
 		return 
-				"Controller "+devType+" modification "+devMod+" HW "+verHardWare+" FW "+verFirmWare+" ("+firmWareBuildDate+") BL "+
-				verBootLoader+" language is "+lang+" IMEI="+IMEI
+				"Controller "+devType+" modification "+devMod+" HW "+getHardWareVersion()+" FW "+getFirmWareVersion()+" ("+firmWareBuildDate+") BL "+
+				getBootLoaderVersion()+" language is "+lang+" IMEI="+IMEI
 				;
 	}
 	
@@ -96,18 +96,22 @@ public class CCU825DeviceInfo {
 		return IMEI;
 	}
 
-	public short getVerHardWare() {
-		return verHardWare;
+	public short getVerHardWare() {		return verHardWare;	}
+	public short getVerFirmWare() {		return verFirmWare;	}
+	public short getVerBootLoader() {	return verBootLoader;	}
+
+	public String getHardWareVersion() {
+		return String.format("%02d.%02d", (verHardWare >> 8) & 0xFF, verHardWare & 0xFF);
 	}
 
-	public short getVerFirmWare() {
-		return verFirmWare;
+	public String getFirmWareVersion() {
+		return String.format("%02d.%02d", (verFirmWare >> 8) & 0xFF, verFirmWare & 0xFF);
 	}
 
-	public short getVerBootLoader() {
-		return verBootLoader;
+	public String getBootLoaderVersion() {
+		return String.format("%02d.%02d", (verBootLoader >> 8) & 0xFF, verBootLoader & 0xFF);
 	}
-
+	
 
 	public byte[] getSerialNumber() {
 		return serialNumber;
