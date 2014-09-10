@@ -34,7 +34,7 @@ public class CCU825Test
 		
 			CCU825ReturnCode protocolRC = c.connect();
 			
-			System.out.print("RC = " + protocolRC );			
+			System.out.println("RC = " + protocolRC );			
 			System.out.println( c.getDeviceInfo() );
 			
 			//System.out.println( c.getSysInfo() );
@@ -46,8 +46,9 @@ public class CCU825Test
 		}
 
 		
-		System.out.println(c.getDeviceInfo());
+		//System.out.println(c.getDeviceInfo());
 	
+		/*
 		for( int i = 20; i > 0; i-- )
 		{
 			try {
@@ -59,7 +60,7 @@ public class CCU825Test
 				log.severe(e.getMessage());
 			}			
 		}
-		
+		*/
 	}
 
 

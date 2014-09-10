@@ -54,6 +54,9 @@ public class CCU825Packet {
 
 	private byte[] data;
 	private byte[] payload;
+
+
+	private int dataSize;
 	
 	/**
 	 * Construct packet object from raw protocol data received from ModBus IO transaction.
@@ -84,6 +87,7 @@ public class CCU825Packet {
 		// Packet is ok
 		
 		this.data = data;
+		this.dataSize = pktLen+8;
 		
 		payload = new byte[plen];
 		System.arraycopy(data, PKT_HEADER_LEN, payload, 0, plen);
@@ -104,6 +108,15 @@ public class CCU825Packet {
 	 */
 
 	public byte[] getPacketBytes() {
+		data[4] = 0;
+		data[5] = 0;
+		
+		int calcCheckSum = makeCheckSum(data,dataSize);
+		
+		data[4] = (byte) ( calcCheckSum & 0xFF );  
+		data[5] = (byte) ((calcCheckSum >> 8) & 0xFF );    		
+		//bb.putShort(4, (short)calcCheckSum);
+		
 		return data;
 	}
 
@@ -279,15 +292,17 @@ public class CCU825Packet {
 		//out[6] = (byte) ( payload.length & 0xFF );  
 		//out[7] = (byte) ((payload.length >> 8) & 0xFF );    		
 		bb.putShort(6, (short)payload.length);
-		
+
+		/* do it just before returning array for send code
 		int calcCheckSum = makeCheckSum(out,outSize);
 		
 		//out[4] = (byte) ( calcCheckSum & 0xFF );  
 		//out[5] = (byte) ((calcCheckSum >> 8) & 0xFF );    		
 		bb.putShort(4, (short)calcCheckSum);
-		
+		*/
 		
 		data = out;
+		dataSize = outSize;
 	}
 
 
