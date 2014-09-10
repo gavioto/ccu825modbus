@@ -189,17 +189,8 @@ public class CCU825Packet {
 	 * @throws CCU825PacketFormatException Length value is insane
 	 */
 	
-	private int checkLen(byte[] data, short recvLen) throws CCU825PacketFormatException  {
-		
-		/*
-		int rll = data[6];
-		int rlh = data[7];
-		
-		rll &= 0xFF;
-		rlh &= 0xFF;
-		
-		int recvLen = (rlh << 8) | rll; 
-		*/
+	private int checkLen(byte[] data, short recvLen) throws CCU825PacketFormatException  
+	{
 		if( recvLen+8 > data.length )
 			throw new CCU825PacketFormatException("got len=" + recvLen+8 + " in pkt, actual "+ data.length);
 		
@@ -214,18 +205,8 @@ public class CCU825Packet {
 	 * @throws CCU825CheckSumException Checksum was wrong.
 	 */
 	
-	private void checkCheckSum(byte[] data, int len, int recvCheckSum) throws CCU825CheckSumException {
-		/*
-		int rcl = data[4];
-		int rch = data[5];
-		
-		rcl &= 0xFF;
-		rch &= 0xFF;
-		
-		int recvCheckSum = (rch << 8) | rcl; 
-		*/
-		
-		
+	private void checkCheckSum(byte[] data, int len, int recvCheckSum) throws CCU825CheckSumException 
+	{
 		data[4] = 0;
 		data[5] = 0;
 		
@@ -236,7 +217,7 @@ public class CCU825Packet {
 			String msg = String.format( "got checksum=%04X in pkt, calculated=%04X", recvCheckSum, calcCheckSum );
 			log.severe( msg );
 			//throw new CCU825CheckSumException("got checksum=" + Integer.toHexString(recvCheckSum) + " in pkt, calculated="+ Integer.toHexString(calcCheckSum) );
-			//throw new CCU825CheckSumException( msg );
+			throw new CCU825CheckSumException( msg );
 		}
 	}
 
