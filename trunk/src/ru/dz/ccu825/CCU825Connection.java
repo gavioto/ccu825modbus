@@ -112,9 +112,9 @@ public class CCU825Connection {
 		else
 			spd = packetBytes;
 			
-		if(dataDumpEnabled ) CCU825Test.dumpBytes( "modbus send", spd );
+		if( dataDumpEnabled ) CCU825Test.dumpBytes( "modbus send", spd );
 		byte[] rcv = mc.rwMultiple( CCU825Packet.MAXPACKET+1/2, spd );
-		if(dataDumpEnabled) CCU825Test.dumpBytes( "modbus recv", rcv );
+		if( dataDumpEnabled) CCU825Test.dumpBytes( "modbus recv", rcv );
 
 
 		/*
@@ -164,7 +164,8 @@ public class CCU825Connection {
 		int tries;
 
 		// 1. send/get syn
-
+		//dataDumpEnabled = true;
+		
 		for( tries = NTRIES; tries > 0; tries-- )
 		{
 
