@@ -11,8 +11,8 @@ import ru.dz.ccu825.pkt.CCU825DeviceInfoReqPacket;
 import ru.dz.ccu825.pkt.CCU825EmptyPacket;
 import ru.dz.ccu825.pkt.CCU825OutStateCmdPacket;
 import ru.dz.ccu825.pkt.CCU825SysInfoReqPacket;
+import ru.dz.ccu825.pkt.CCU825ZeroLenghPacket;
 import ru.dz.ccu825.transport.ModBusConnection;
-import ru.dz.ccu825.util.CCU825CheckSumException;
 import ru.dz.ccu825.util.CCU825Exception;
 import ru.dz.ccu825.util.CCU825PacketFormatException;
 import ru.dz.ccu825.util.CCU825ProtocolException;
@@ -43,6 +43,10 @@ public class CCU825Connection {
 	private int lastRecvSeq;
 
 	private CCU825DeviceInfo deviceInfo;
+
+	private boolean encryptionEnabled = false;
+
+	private boolean dataDumpEnabled = false;
 
 	/**
 	 * Init a connection. Does nothing.
@@ -97,17 +101,32 @@ public class CCU825Connection {
 
 		assert( (writeBytes & 1) == 0 );
 
-		RC4 enc = new RC4(key);
-		byte[] spd = enc.encrypt(packetBytes);
-
-		CCU825Test.dumpBytes( "modbus send", spd );
+		byte[] spd;
+		if(encryptionEnabled)
+		{
+			RC4 enc = new RC4(key);
+			spd = enc.encrypt(packetBytes);
+			System.arraycopy(spd, 0, packetBytes, 0, 8); // header is unencrypted
+		}
+		else
+			spd = packetBytes;
+			
+		if(dataDumpEnabled ) CCU825Test.dumpBytes( "modbus send", spd );
 		byte[] rcv = mc.rwMultiple( CCU825Packet.MAXPACKET+1/2, spd );
-		CCU825Test.dumpBytes( "modbus recv", rcv );
+		if(dataDumpEnabled) CCU825Test.dumpBytes( "modbus recv", rcv );
 
 
-		RC4 dec = new RC4(key);
-		byte[] rpd = dec.decrypt(rcv);
-
+		byte[] rpd;
+		if(encryptionEnabled)
+		{
+			RC4 dec = new RC4(key);
+			rpd = dec.decrypt(rcv);
+			
+			System.arraycopy(rcv, 0, rpd, 0, 8); // header is unencrypted
+		}
+		else
+			rpd = rcv;
+		
 		CCU825Packet rp = new CCU825Packet(rpd);
 
 		int recvAck = rp.getAckNum();
@@ -115,16 +134,17 @@ public class CCU825Connection {
 
 		// It seems to be a "can't happen" thing in modbus-based proto, as modbus io is syncronous, but...
 
-		if( recvAck != currentSeq-1 )
+		if( recvAck != currentSeq )
 		{
-			//logErr("our seq = " + (currentSeq-1) + " recv ack = " + recvAck);
-			throw new CCU825PacketFormatException("our seq = " + (currentSeq-1) + " recv ack = " + recvAck);
+			String msg = "our seq = " + currentSeq + " recv ack = " + recvAck; 
+			logErr(msg);
+			//throw new CCU825PacketFormatException(msg);
 		}
-
-		currentAck++;
 
 		if( currentAck != lastRecvSeq )
 			logErr("our ack = " + (currentAck) + " recv seq = " + lastRecvSeq);
+
+		currentAck++;
 
 		return rp;
 	}
@@ -146,17 +166,18 @@ public class CCU825Connection {
 		{
 
 			try {
-				CCU825EmptyPacket sp = new CCU825EmptyPacket();
+				CCU825ZeroLenghPacket sp = new CCU825ZeroLenghPacket();
 
 				sp.setSyn( true );
 
-				CCU825Packet rp = exchange( sp ); // TODO catch timeout
+				CCU825Packet rp = exchange( sp );
 
 				byte[] rdata = rp.getPacketBytes();
 
+				/*
 				if( rdata[0] != CCU825Packet.PKT_TYPE_EMPTY )
 					logErr("wrong packet type" + rdata[0] );
-
+				*/
 				if( !rp.isSyn() )
 					throw new CCU825PacketFormatException("no syn in reply" + rdata[1]);
 				//logErr("no syn in reply" + rdata[1] );
@@ -183,7 +204,7 @@ public class CCU825Connection {
 			try {
 				CCU825Packet rp = exchange(new CCU825DeviceInfoReqPacket() );		
 				deviceInfo = new CCU825DeviceInfo(rp.getPacketPayload());
-			
+				break;
 			} catch( CCU825ProtocolException ex )
 			{
 				logProtoErr( ex );
@@ -193,6 +214,9 @@ public class CCU825Connection {
 
 		if( tries == 0 ) throw new CCU825Exception("Can't get device info");
 
+		// Now switch to encrypted mode
+		setEncryptionEnabled(true);
+		
 		// 3. Ack devinfo and get return code
 
 		int protocolRC = 0;
@@ -209,8 +233,8 @@ public class CCU825Connection {
 					logErr("wrong packet type" + rdata[0] );
 
 				protocolRC = rdata[1];
-
-
+				break;
+				
 			} catch( CCU825ProtocolException ex )
 			{
 				logProtoErr( ex );
@@ -284,6 +308,22 @@ public class CCU825Connection {
 			bits = mask;
 	
 		setOutState(bits, mask);
+	}
+
+	public boolean isEncryptionEnabled() {
+		return encryptionEnabled;
+	}
+
+	public void setEncryptionEnabled(boolean encryptionEnabled) {
+		this.encryptionEnabled = encryptionEnabled;
+	}
+
+	public boolean isDataDumpEnabled() {
+		return dataDumpEnabled;
+	}
+
+	public void setDataDumpEnabled(boolean dataDumpEnabled) {
+		this.dataDumpEnabled = dataDumpEnabled;
 	}
 
 }

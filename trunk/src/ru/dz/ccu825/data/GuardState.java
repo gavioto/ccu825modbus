@@ -2,7 +2,6 @@ package ru.dz.ccu825.data;
 
 import java.util.logging.Logger;
 
-import ru.dz.ccu825.CCU825Connection;
 
 /**
  * Represents state of a guard zone (partition) = what CCU does for that zone: 

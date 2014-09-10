@@ -11,6 +11,7 @@ public abstract class DoublePollItemHandler extends PollItemHandler {
 		
 		try {
 			double v = Double.parseDouble(value);
+			transfer(item, v);
 		} catch (NumberFormatException e) {
 			log.severe(e.getMessage());
 			//e.printStackTrace();
