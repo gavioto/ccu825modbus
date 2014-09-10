@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import ru.dz.ccu825.util.CCU825CheckSumException;
 import ru.dz.ccu825.util.CCU825PacketFormatException;
 import ru.dz.ccu825.util.CRC16;
+import ru.dz.ccu825.util.RC4;
 
 /**
  * Represents CCU825-SM protocol packet. Does assembly/disassembly.
@@ -58,12 +59,13 @@ public class CCU825Packet {
 	 * Construct packet object from raw protocol data received from ModBus IO transaction.
 	 * 
 	 * @param data What we've got from ModBus fn23 
+	 * @param key 
 	 * 
 	 * @throws CCU825CheckSumException
 	 * @throws CCU825PacketFormatException
 	 */
 	
-	public CCU825Packet( byte [] data ) throws CCU825CheckSumException, CCU825PacketFormatException {
+	public CCU825Packet( byte [] data, byte[] key ) throws CCU825CheckSumException, CCU825PacketFormatException {
 		if( data.length < PKT_HEADER_LEN )
 			throw new CCU825PacketFormatException("packet len < " + PKT_HEADER_LEN);
 
@@ -78,11 +80,20 @@ public class CCU825Packet {
 		
 		int plen = checkLen(data, pktLen );		
 		checkCheckSum( data, pktCs );
+
+		// Packet is ok
+		
+		this.data = data;
 		
 		payload = new byte[plen];
 		System.arraycopy(data, PKT_HEADER_LEN, payload, 0, plen);
 		
-		this.data = data;
+		if( isEnc() )
+		{
+			RC4 dec = new RC4(key);
+			payload = dec.decrypt(payload);
+		}
+		
 	}
 
 
@@ -119,6 +130,16 @@ public class CCU825Packet {
 			data[1] &= ~PKT_FLAG_SYN;
 	}
 	
+	
+
+	public void setEnc(boolean encryptionEnabled) {
+		if( encryptionEnabled )
+			data[1] |= PKT_FLAG_ENC;
+		else
+			data[1] &= ~PKT_FLAG_ENC;
+	}
+
+		
 	/**
 	 * @return True if packet header has SYN flag.
 	 */
@@ -136,6 +157,13 @@ public class CCU825Packet {
 	}
 	
 	
+	/**
+	 * @return True if packet header has ENC flag. (Packet payload is encrypted)	
+	 */
+	
+	public boolean isEnc() {
+		return (data[1] & PKT_FLAG_ENC) != 0;
+	}
 	
 	
 	
@@ -271,7 +299,8 @@ public class CCU825Packet {
 	public int getSeqNum() { return data[2]; }
 	public int getAckNum() { return data[3]; }
 
-	
+
+
 
 
 

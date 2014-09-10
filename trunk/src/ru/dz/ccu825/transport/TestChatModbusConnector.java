@@ -53,6 +53,14 @@ public class TestChatModbusConnector implements ModBusConnection {
 			return deviceInfoPacket; 
 		}
 		
+		// this is wrong, but just for test...
+		if( writeData.length == 12 )
+		{
+			// rc
+			return rcPacket; 
+		}
+				
+		
 		if( (writeData.length == 11) && (writeData[8] == 0x2A) && (writeData[8] == 0xB0) && (writeData[8] == 0x89) )
 		{
 			// rc
