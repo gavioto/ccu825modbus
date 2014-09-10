@@ -94,6 +94,7 @@ public class CCU825Connection {
 		//send.setAckNum( currentAck );
 		send.setAckNum( lastRecvSeq );
 
+		send.setEnc(encryptionEnabled);
 
 		byte [] packetBytes = send.getPacketBytes();
 
@@ -116,6 +117,7 @@ public class CCU825Connection {
 		if(dataDumpEnabled) CCU825Test.dumpBytes( "modbus recv", rcv );
 
 
+		/*
 		byte[] rpd;
 		if(encryptionEnabled)
 		{
@@ -126,8 +128,9 @@ public class CCU825Connection {
 		}
 		else
 			rpd = rcv;
+		*/
 		
-		CCU825Packet rp = new CCU825Packet(rpd);
+		CCU825Packet rp = new CCU825Packet(rcv,key);
 
 		int recvAck = rp.getAckNum();
 		lastRecvSeq = rp.getSeqNum();
