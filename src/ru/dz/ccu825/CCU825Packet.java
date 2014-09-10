@@ -79,7 +79,7 @@ public class CCU825Packet {
 		short pktCs = bb.getShort(4);
 		
 		int plen = checkLen(data, pktLen );		
-		checkCheckSum( data, pktCs );
+		checkCheckSum( data, pktLen+8, pktCs );
 
 		// Packet is ok
 		
@@ -201,7 +201,7 @@ public class CCU825Packet {
 	 * @throws CCU825CheckSumException Checksum was wrong.
 	 */
 	
-	private void checkCheckSum(byte[] data, short recvCheckSum) throws CCU825CheckSumException {
+	private void checkCheckSum(byte[] data, int len, int recvCheckSum) throws CCU825CheckSumException {
 		/*
 		int rcl = data[4];
 		int rch = data[5];
@@ -216,9 +216,9 @@ public class CCU825Packet {
 		data[4] = 0;
 		data[5] = 0;
 		
-		int calcCheckSum = makeCheckSum(data);
+		int calcCheckSum = makeCheckSum(data,len);
 		
-		if( calcCheckSum != recvCheckSum )
+		if( calcCheckSum != (recvCheckSum & 0xFFFF) )
 		{
 			String msg = String.format( "got checksum=%04X in pkt, calculated=%04X", recvCheckSum, calcCheckSum );
 			log.severe( msg );
@@ -231,11 +231,12 @@ public class CCU825Packet {
 	/** Calc a checksum for a packet.
 	 * 
 	 * @param data packet
+	 * @param len 
 	 * @return 16 bits of a checksum
 	 */
 	
-	private int makeCheckSum(byte[] data) {
-		return CRC16.crc(data) & 0xFFFF; // Make sure int has just 16 bits
+	private int makeCheckSum(byte[] data, int len) {
+		return CRC16.crc(data,len) & 0xFFFF; // Make sure int has just 16 bits
 	}
 	
 	
@@ -279,7 +280,7 @@ public class CCU825Packet {
 		//out[7] = (byte) ((payload.length >> 8) & 0xFF );    		
 		bb.putShort(6, (short)payload.length);
 		
-		int calcCheckSum = makeCheckSum(out);
+		int calcCheckSum = makeCheckSum(out,outSize);
 		
 		//out[4] = (byte) ( calcCheckSum & 0xFF );  
 		//out[5] = (byte) ((calcCheckSum >> 8) & 0xFF );    		

@@ -12,8 +12,8 @@ public class CRC16Test {
 	@Test
 	public void testCrc1() {
 		byte[] testIn = { 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39 };
-		int crc = CRC16.crc(testIn );
-		assertEquals(0xBB3D, crc);
+		int crc = CRC16.crc( testIn, testIn.length );
+		assertEquals(0x4B37, crc);
 	}
 	
 	@Test
@@ -23,9 +23,9 @@ public class CRC16Test {
 		
 		fillArray( testIn, (byte)0 );
 		
-		int crc = CRC16.crc(testIn);		
+		int crc = CRC16.crc(testIn, testIn.length);		
 		
-		assertEquals(0, crc);
+		assertEquals(0x0B40, crc);
 	}
 
 	private void fillArray(byte[] testIn, byte c) {

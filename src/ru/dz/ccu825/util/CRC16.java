@@ -46,12 +46,14 @@ public class CRC16 {
         };
 
 
-	public static int crc( byte [] bytes )
+	public static int crc( byte [] bytes, int len )
 	{
 
-        int crc = 0x0000;
+        //int crc = 0x0000;
+        int crc = 0xFFFF; // modbus CRC16
         
         for (byte b : bytes) {
+            if( len-- <= 0) break;
             crc = (crc >>> 8) ^ table[(crc ^ b) & 0xff];
         }
 

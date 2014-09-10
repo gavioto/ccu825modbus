@@ -40,9 +40,9 @@ public class CCU825DeviceInfoTest {
 		
 		CCU825DeviceInfo di = new CCU825DeviceInfo(pl);
 		
-		//System.err.println(di);
+		System.err.println(di);
 		
-		assertEquals( di.toString(), "Controller CCU825 modification SM HW 1 FW 2 (Sep 08 2014) BL 3 language is RUS IMEI=49-015420-323751");
+		assertEquals( di.toString(), "Controller CCU825 modification SM HW 00.01 FW 00.02 (Sep 08 2014) BL 00.03 language is RUS IMEI=49-015420-323751");
 		
 		assertEquals(0x01, di.getVerHardWare() );
 		assertEquals(0x02, di.getVerFirmWare() );
