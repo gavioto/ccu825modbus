@@ -4,14 +4,15 @@ import java.util.logging.Logger;
 
 import ru.dz.ccu825.payload.CCU825ReturnCode;
 import ru.dz.ccu825.payload.CCU825SysInfo;
-import ru.dz.ccu825.push.PollOpenHAB;
 import ru.dz.ccu825.push.PushOpenHAB;
-import ru.dz.ccu825.transport.ModBusConnection;
 import ru.dz.ccu825.transport.EmptyModbusConnector;
+import ru.dz.ccu825.transport.ModBusConnection;
+import ru.dz.ccu825.transport.TestChatModbusConnector;
 import ru.dz.ccu825.util.CCU825Exception;
 import ru.dz.ccu825.util.CCU825ProtocolException;
 
-public class CCU825Test {
+public class CCU825Test 
+{
 	private final static Logger log = Logger.getLogger(CCU825Test.class.getName());
 
 
@@ -20,26 +21,27 @@ public class CCU825Test {
 	 */
 	public static void main(String[] args) {				
 		
-		ModBusConnection mc = new EmptyModbusConnector();
+		ModBusConnection mc = new TestChatModbusConnector();
 		PushOpenHAB oh = new PushOpenHAB("localhost");
 
 		oh.setDefaultItemNames();
 		
-		byte[] key = { 0x00, 0x00, 0x00, 0x00 };
+		byte[] key = TestChatModbusConnector.key;
 		
 		CCU825Connection c = new CCU825Connection(mc, key);
 		
 		try {
 		
 			CCU825ReturnCode protocolRC = c.connect();
-			System.out.print("RC = " + protocolRC );
 			
+			System.out.print("RC = " + protocolRC );			
 			System.out.println( c.getDeviceInfo() );
 			
 			//System.out.println( c.getSysInfo() );
 			
 		} catch (CCU825Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
+			log.severe(e.getMessage());
 			return;
 		}
 
@@ -53,7 +55,8 @@ public class CCU825Test {
 				oh.sendSysInfo(si);
 				System.out.println(si);
 			} catch (CCU825ProtocolException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
+				log.severe(e.getMessage());
 			}			
 		}
 		

@@ -2,6 +2,7 @@ package ru.dz.ccu825;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.logging.Logger;
 
 import ru.dz.ccu825.util.CCU825CheckSumException;
 import ru.dz.ccu825.util.CCU825PacketFormatException;
@@ -15,6 +16,8 @@ import ru.dz.ccu825.util.CRC16;
  */
 
 public class CCU825Packet {
+	private final static Logger log = Logger.getLogger(CCU825Packet.class.getName());
+
 
 	private static final int PKT_MAX_PAYLOAD = 1545;
 	private static final int PKT_HEADER_LEN = 8;
@@ -156,8 +159,8 @@ public class CCU825Packet {
 		
 		int recvLen = (rlh << 8) | rll; 
 		*/
-		if( recvLen+8 < data.length )
-			throw new CCU825PacketFormatException("got " + recvLen+8 + "len in pkt, actual "+ data.length);
+		if( recvLen+8 > data.length )
+			throw new CCU825PacketFormatException("got len=" + recvLen+8 + " in pkt, actual "+ data.length);
 		
 		return recvLen;
 	}
@@ -188,7 +191,12 @@ public class CCU825Packet {
 		int calcCheckSum = makeCheckSum(data);
 		
 		if( calcCheckSum != recvCheckSum )
-			throw new CCU825CheckSumException("got " + recvCheckSum + "in pkt, calculated "+ calcCheckSum);
+		{
+			String msg = String.format( "got checksum=%04X in pkt, calculated=%04X", recvCheckSum, calcCheckSum );
+			log.severe( msg );
+			//throw new CCU825CheckSumException("got checksum=" + Integer.toHexString(recvCheckSum) + " in pkt, calculated="+ Integer.toHexString(calcCheckSum) );
+			//throw new CCU825CheckSumException( msg );
+		}
 	}
 
 	
