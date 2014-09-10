@@ -144,7 +144,7 @@ public class CCU825Connection {
 		{
 			String msg = "our seq = " + currentSeq + " recv ack = " + recvAck; 
 			logErr(msg);
-			//throw new CCU825PacketFormatException(msg);
+			throw new CCU825PacketFormatException(msg);
 		}
 
 		if( currentAck != lastRecvSeq )
