@@ -8,7 +8,6 @@ import ru.dz.ccu825.payload.CCU825ReturnCode;
 import ru.dz.ccu825.payload.CCU825SysInfo;
 import ru.dz.ccu825.pkt.CCU825DeviceInfoAckPacket;
 import ru.dz.ccu825.pkt.CCU825DeviceInfoReqPacket;
-import ru.dz.ccu825.pkt.CCU825EmptyPacket;
 import ru.dz.ccu825.pkt.CCU825OutStateCmdPacket;
 import ru.dz.ccu825.pkt.CCU825SysInfoReqPacket;
 import ru.dz.ccu825.pkt.CCU825ZeroLenghPacket;
@@ -19,14 +18,14 @@ import ru.dz.ccu825.util.CCU825ProtocolException;
 import ru.dz.ccu825.util.RC4;
 
 /**
- * 
- * @author dz
  *
  * Connection to an instance of CCU825 device. Implements device-specific protocol over the (implemented elsewhere) modbus.
- * 
- * Conforms CCU825-SM protocol spec. from 5 September 2014, firmware ver. 01.02.
+ * <p>
+ * Conforms to CCU825-SM protocol spec. from 5 September 2014, firmware ver. 01.02.
  * 
  * Needs an external modbus io driver to work.
+ * 
+ * @author dz
  *
  */
 
@@ -166,6 +165,9 @@ public class CCU825Connection {
 	private CCU825ReturnCode initProtocol() throws CCU825Exception {
 		int tries;
 
+		// Start with no encryption
+		setEncryptionEnabled(false);
+
 		// 1. send/get syn
 		//dataDumpEnabled = true;
 		
@@ -282,6 +284,7 @@ public class CCU825Connection {
 	}
 
 	/**
+	 * Access informaion about the device such as IMEI, HW version, etc.
 	 * 
 	 * @return device info as we got in protocol init transaction
 	 */
@@ -291,8 +294,12 @@ public class CCU825Connection {
 
 
 	/**
-	 * Does a request to change outputs
-	 * @return actual out state from device
+	 * Does a request to change outputs. Can change a group of outputs at once. 
+	 * 
+	 * @param state new state of ouputs, bit per output
+	 * @param mask only outputs with 1's in corresponding mask bits are changed
+	 * 
+	 * @return actual outputs state from device
 	 * @throws CCU825ProtocolException
 	 */
 	public int setOutState( int state, int mask ) throws CCU825ProtocolException
@@ -301,11 +308,23 @@ public class CCU825Connection {
 		return new CCU825OutState(rp.getPacketPayload()).getOutBits();
 	}
 	
+	/**
+	 * Request actual outputs state. 
+	 * @return actual outputs state from device
+	 * @throws CCU825ProtocolException
+	 */
 	public int getOutState(  ) throws CCU825ProtocolException
 	{
 		return setOutState( 0, 0 ); // Mask of zeros = modify none
 	}
 
+	/**
+	 * Set or reset one output.
+	 * 
+	 * @param nOutBit Output to change, 0-6
+	 * @param state new state
+	 * @throws CCU825ProtocolException
+	 */
 	public void setOutState(int nOutBit, boolean state) throws CCU825ProtocolException 
 	{
 		int mask = (1 << nOutBit);
@@ -317,18 +336,34 @@ public class CCU825Connection {
 		setOutState(bits, mask);
 	}
 
+	/**
+	 * If encryption is currently enabled.
+	 * @return True if we do encryption.
+	 */
 	public boolean isEncryptionEnabled() {
 		return encryptionEnabled;
 	}
 
-	public void setEncryptionEnabled(boolean encryptionEnabled) {
+	/**
+	 * Enable or disable encryption. You better don't. Protocol driver does it by itself.
+	 * Can be possibly needed to restart handshake. 
+	 * 
+	 * @param encryptionEnabled True to enable.
+	 */
+	private void setEncryptionEnabled(boolean encryptionEnabled) {
 		this.encryptionEnabled = encryptionEnabled;
 	}
 
+	/* who needs
 	public boolean isDataDumpEnabled() {
 		return dataDumpEnabled;
-	}
+	}*/
 
+	/**
+	 * Dump or not all I/O.
+	 * 
+	 * @param dataDumpEnabled True to enable packet data logging.
+	 */
 	public void setDataDumpEnabled(boolean dataDumpEnabled) {
 		this.dataDumpEnabled = dataDumpEnabled;
 	}

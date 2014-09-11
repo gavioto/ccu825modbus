@@ -1,7 +1,7 @@
 /**
- * CCU825 request packets. 
- */
-/**
+ * 
+ * CCU825 request packets.
+ *  
  * @author dz
  *
  */

@@ -11,6 +11,13 @@ import ru.dz.ccu825.transport.TestChatModbusConnector;
 import ru.dz.ccu825.util.CCU825Exception;
 import ru.dz.ccu825.util.CCU825ProtocolException;
 
+/**
+ * 
+ * CCU825 driver main class for debugging and test purposes.
+ * 
+ * @author dz
+ *
+ */
 public class CCU825Test 
 {
 	private final static Logger log = Logger.getLogger(CCU825Test.class.getName());

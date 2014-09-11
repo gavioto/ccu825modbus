@@ -1,7 +1,7 @@
 /**
- * CCU825 protocol implementation, top level. 
- */
-/**
+ * 
+ * CCU825 protocol implementation, top level package. 
+ * 
  * @author dz
  *
  */

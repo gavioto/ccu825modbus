@@ -1,6 +1,15 @@
 package ru.dz.ccu825.util;
 
-// got from http://stackoverflow.com/questions/12289717/rc4-encryption-java
+
+/**
+ * 
+ * Java implementation of RC4 (ARC4) encryption.
+ * <p>
+ * got from http://stackoverflow.com/questions/12289717/rc4-encryption-java
+ * 
+ *
+ */
+
 
 public class RC4 {
 

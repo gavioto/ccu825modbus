@@ -6,9 +6,14 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+
 /**
  * Connect to MasterKit 8038 board RS232 through TCP/IP protocol convertor.
- * Read temperature sensor data.
+ * <p>
+ * <li>Read temperature sensor data.
+ * <li>Read ADC values.
+ * <li>Set DO state.
+ * <p>
  * 
  * @author dz
  *
@@ -16,7 +21,10 @@ import java.net.UnknownHostException;
 public class NM8036Connection 
 {
 	private static final int MAX_SENSORS = 128;
+	
 	private static final int N_AI = 4;
+	private static final int N_DO = 12;
+	
 	private String hostName;
 	private int port;
 
@@ -117,9 +125,7 @@ public class NM8036Connection
 		drainInput();
 		sendByte((byte)'s');
 		
-		int echo = readByte();
-		if( (echo & 0xFF) != ((byte)'s'))
-			throw new IOException("no 's' echo");
+		expectByte(((byte)'s'));
 		
 		int[] out = new int[N_AI];
 		
@@ -131,15 +137,43 @@ public class NM8036Connection
 		
 		return out;
 	}
+	
+	private void expectByte(byte expect) throws IOException 
+	{
+		int echo = readByte();
+		if( (echo & 0xFF) != expect)
+			throw new IOException("no 's' echo");
+	}
 		
 	private int readAinValue() throws IOException
 	{
 		return readShort();
 	}
 
-	
-	public void setPwmValues(int[] percentages)
+	/**
+	 * PWM values for output, 0-100
+	 * @param percentages int[12]
+	 * @throws IOException
+	 * @throws ArrayIndexOutOfBoundsException if percentage not in 0-100 range 
+	 */
+	public void setPwmValues(int[] percentages) throws IOException
 	{
+		drainInput();
+		sendByte((byte)'a');
+		expectByte((byte)'a');
+
+		for( int i = 0; i < N_DO; i++ )
+		{
+			int p = percentages[i];
+			if( (p < 0) || (p > 100) )
+				throw new ArrayIndexOutOfBoundsException(p);
+		}
+		
+		for( int i = 0; i < N_DO; i++ )
+			sendByte((byte)percentages[i]);
+		
+		for( int i = 0; i < N_DO; i++ )
+			sendByte( (byte)(100-percentages[i]) );
 		
 	}
 	

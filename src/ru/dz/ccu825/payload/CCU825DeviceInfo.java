@@ -9,6 +9,9 @@ import ru.dz.ccu825.util.CCU825PacketFormatException;
 
 /**
  * DeviceInfo packet decoder
+ * <p>
+ * See getters for details.
+ * 
  * @author dz
  *
  */
