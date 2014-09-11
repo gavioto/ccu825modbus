@@ -1,5 +1,11 @@
 package ru.dz.ccu825.push;
 
+/**
+ * Used to process received data.
+ * 
+ * @author dz
+ *
+ */
 public abstract class PollItemHandler
 {
 	/**

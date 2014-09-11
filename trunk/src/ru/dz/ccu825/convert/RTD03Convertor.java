@@ -1,7 +1,9 @@
 package ru.dz.ccu825.convert;
 
 /**
- * Convert RTD03 output voltage to temperature
+ * Convert RTD03 output voltage to temperature.
+ * <p>
+ * Can be tuned with offset and multiplier.
  * 
  * @author dz
  *
@@ -19,6 +21,7 @@ public class RTD03Convertor implements IConvertor
 	
 	/**
 	 * Voltage to temperature
+	 * 
 	 */
 	@Override
 	public double convert(double in) 
@@ -28,6 +31,7 @@ public class RTD03Convertor implements IConvertor
 
 	/**
 	 * Temperature to voltage
+	 * 
 	 */
 	@Override
 	public double convertBack(double in) 
@@ -46,7 +50,7 @@ public class RTD03Convertor implements IConvertor
 
 	/**
 	 * Temperature coefficient
-	 * @param tOffset When converting v to t, multiply result to this. Before tOffset!
+	 * @param tMult When converting v to t, multiply result to this. Before tOffset!
 	 */
 	public void settMult(double tMult) {		this.tMult = tMult;	}
 	public double gettMult() {		return tMult;	}

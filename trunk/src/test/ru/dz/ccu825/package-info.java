@@ -1,7 +1,7 @@
 /**
- * Unit tests. 
- */
-/**
+ * 
+ * Unit tests for the CCU825 library.
+ *  
  * @author dz
  *
  */

@@ -1,7 +1,9 @@
 /**
- * CCU825 responce packet payload decoders. 
- */
-/**
+ * 
+ * CCU825 response packet payload decoders.
+ * <p>
+ * Decode binary packet payload, break down in fields.
+ *  
  * @author dz
  *
  */

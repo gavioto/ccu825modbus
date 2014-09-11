@@ -1,7 +1,6 @@
 /**
- * Tests. 
- */
-/**
+ * Tests main classes for the parts of the code.
+ *  
  * @author dz
  *
  */
