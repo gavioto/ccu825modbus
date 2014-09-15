@@ -42,6 +42,7 @@ public class ArmModeChange
 	public String getIdent() {
 		return ident;
 	}
-	
+
+	// TODO tostring
 
 }
