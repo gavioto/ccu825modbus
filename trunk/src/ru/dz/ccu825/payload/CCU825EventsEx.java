@@ -8,26 +8,26 @@ import ru.dz.ccu825.CCU825Packet;
 import ru.dz.ccu825.util.CCU825PacketFormatException;
 
 /**
- * Events packet payload decoder
+ * EventsEx packet payload decoder
  * @author dz
  *
  */
 
-public class CCU825Events extends AbstractEvents  {
+public class CCU825EventsEx extends AbstractEvents  {
 
-	public CCU825Events(byte [] in ) throws CCU825PacketFormatException {
+	public CCU825EventsEx(byte [] in ) throws CCU825PacketFormatException {
 		ByteBuffer bb = ByteBuffer.wrap(in);
 
 		bb.order(ByteOrder.LITTLE_ENDIAN);
 
-		if( in[0] != CCU825Packet.PKT_TYPE_EVENTS )
+		if( in[0] != CCU825Packet.PKT_TYPE_EVENTS_EX )
 			throw new CCU825PacketFormatException("Wrong Events payload header byte");
 
-		si = new CCU825SysInfo(bb);
+		si = new CCU825SysInfoEx(bb);
 
-		nEvents = in[79];
+		nEvents = in[189];
 		events = new byte[nEvents];
-		System.arraycopy(in, 80, events, 0, nEvents);
+		System.arraycopy(in, 190, events, 0, nEvents);
 
 	}
 

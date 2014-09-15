@@ -2,14 +2,18 @@ package ru.dz.ccu825;
 
 import java.util.logging.Logger;
 
+import ru.dz.ccu825.data.CCU825ReturnCode;
 import ru.dz.ccu825.payload.CCU825DeviceInfo;
+import ru.dz.ccu825.payload.CCU825Events;
+import ru.dz.ccu825.payload.CCU825EventsEx;
 import ru.dz.ccu825.payload.CCU825OutState;
-import ru.dz.ccu825.payload.CCU825ReturnCode;
 import ru.dz.ccu825.payload.CCU825SysInfo;
 import ru.dz.ccu825.payload.CCU825SysInfoEx;
+import ru.dz.ccu825.payload.ICCU825Events;
 import ru.dz.ccu825.payload.ICCU825SysInfo;
 import ru.dz.ccu825.pkt.CCU825DeviceInfoAckPacket;
 import ru.dz.ccu825.pkt.CCU825DeviceInfoReqPacket;
+import ru.dz.ccu825.pkt.CCU825EventsReqPacket;
 import ru.dz.ccu825.pkt.CCU825OutStateCmdPacket;
 import ru.dz.ccu825.pkt.CCU825SysInfoReqPacket;
 import ru.dz.ccu825.pkt.CCU825ZeroLenghPacket;
@@ -76,7 +80,13 @@ public class CCU825Connection {
 		return initProtocol();
 	}
 	
+	/**
+	 * 
+	 * Set mode. Must be ModBus RTU, 9600, 8N1
+	 * 
+	 */
 	private void setupModBus() {
+		
 		mc.setSpeed(9600);		
 	}
 
@@ -294,6 +304,27 @@ public class CCU825Connection {
 		throw new CCU825PacketFormatException(String.format("sysInfo payload type is %X", rp.getPacketPayload()[0]));
 	}
 
+	/**
+	 * Does a request to get Events/EventsEx.
+	 * 
+	 * @return Events list + system information (i/o state etc) at the current moment
+	 * @throws CCU825ProtocolException
+	 */
+	public ICCU825Events getEvents() throws CCU825ProtocolException 
+	{
+		CCU825Packet rp = exchange(new CCU825EventsReqPacket() );
+		switch( rp.getPacketPayload()[0] )
+		{
+		case CCU825Packet.PKT_TYPE_EVENTS:
+			return new CCU825Events(rp.getPacketPayload());
+		case CCU825Packet.PKT_TYPE_EVENTS_EX:
+			return new CCU825EventsEx(rp.getPacketPayload());
+		}
+		
+		throw new CCU825PacketFormatException(String.format("Events payload type is %X", rp.getPacketPayload()[0]));
+	}
+	
+	
 	/**
 	 * Access informaion about the device such as IMEI, HW version, etc.
 	 * 
