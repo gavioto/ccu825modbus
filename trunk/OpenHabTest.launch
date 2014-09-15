@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/ccu825modbus/src/ru/dz/ccu825/CCU825Test.java"/>
+<listEntry value="/ccu825modbus/src/ru/dz/ccu825/push/OpenHabTest.java"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="1"/>
 </listAttribute>
-<listAttribute key="org.eclipse.debug.ui.favoriteGroups">
-<listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
-</listAttribute>
-<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="ru.dz.ccu825.CCU825Test"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="ru.dz.ccu825.push.OpenHabTest"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="ccu825modbus"/>
 </launchConfiguration>
