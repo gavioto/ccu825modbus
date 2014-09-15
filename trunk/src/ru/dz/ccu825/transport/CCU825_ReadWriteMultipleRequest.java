@@ -12,8 +12,10 @@ import com.ghgande.j2mod.modbus.msg.ModbusRequest;
 import com.ghgande.j2mod.modbus.msg.ModbusResponse;
 import com.ghgande.j2mod.modbus.msg.ReadWriteMultipleResponse;
 /**
+ * Modified j2mod class used to support CCU825 modbus connector.
+ * <p> 
  * Class implementing a <tt>Read / Write Multiple Registers</tt> request. Special
- * edition for CCU825 style packet I/O over modbus.
+ * edition for CCU825 style packet I/O over ModBus.
  *
  * @author dz
  */

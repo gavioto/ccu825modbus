@@ -1,9 +1,8 @@
 package ru.dz.ccu825.transport;
 
-import ru.dz.ccu825.CCU825Test;
 
 /**
- * Empty connector to test code with no comm at all.
+ * Test connector providing hanshake test packets.
  * @author dz
  *
  */
@@ -57,15 +56,7 @@ public class TestChatModbusConnector implements ModBusConnection {
 			// Dev info req
 			return deviceInfoPacket; 
 		}
-		
-		/*
-		// this is wrong, but just for test...
-		if( writeData.length == 12 )
-		{
-			// rc
-			return rcPacket; 
-		}
-		*/	
+			
 		
 		if( (writeData.length == 12) && (writeData[8] == 0x2A) && (writeData[9] == -80 /*0xB0*/) && (writeData[10] == -119/*0x89*/) )
 		{

@@ -2,7 +2,6 @@ package ru.dz.ccu825.payload;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Iterator;
 
 import ru.dz.ccu825.CCU825Packet;
 import ru.dz.ccu825.data.ArmModeChange;
@@ -37,5 +36,4 @@ public class CCU825Events extends AbstractEvents  {
 	}
 
 	
-
 }

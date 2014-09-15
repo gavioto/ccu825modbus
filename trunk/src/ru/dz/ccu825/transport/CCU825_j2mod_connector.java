@@ -21,8 +21,9 @@ import com.ghgande.j2mod.modbus.net.ModbusMasterFactory;
 
 public class CCU825_j2mod_connector implements ModBusConnection {
 	private ModbusTransport transport = null;
-	private String dest = "tcp:localhost:502";
-	private int baud = 115200;
+	//private String dest = "tcp:localhost:502";
+	private String dest = "device:com2";
+	private int baud = 9600;
 
 	@Override
 	public void setSpeed(int baud) {
@@ -42,12 +43,13 @@ public class CCU825_j2mod_connector implements ModBusConnection {
 			// 2. Open the connection.
 			transport = ModbusMasterFactory.createModbusMaster(dest);
 			if (transport == null)
-				throw new CCU825Exception("Cannot open TCP");
+				throw new CCU825Exception("Cannot open "+dest);
 
 
 			if (transport instanceof ModbusSerialTransport) {
 				((ModbusSerialTransport) transport).setReceiveTimeout(500);
 				((ModbusSerialTransport) transport).setBaudRate(baud);
+				//transport.s
 			}
 			/*
 			 * There are a number of devices which won't initialize immediately
@@ -59,7 +61,7 @@ public class CCU825_j2mod_connector implements ModBusConnection {
 			if (transport instanceof ModbusTCPTransport) {
 				//unit = 0;
 			} else if (transport instanceof ModbusRTUTransport) {
-				throw new CCU825Exception("Just TCP yet");
+				//throw new CCU825Exception("Just TCP yet");
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -99,7 +101,7 @@ public class CCU825_j2mod_connector implements ModBusConnection {
 		
 		CCU825_ReadWriteMultipleRequest req = new CCU825_ReadWriteMultipleRequest( nRead, writeData.length/2 );
 		
-		req.setUnitID(0);	
+		req.setUnitID(1);	
 		req.setSendData(writeData);
 		
 		// 4. Prepare the transaction
@@ -140,7 +142,7 @@ public class CCU825_j2mod_connector implements ModBusConnection {
 		ReadWriteMultipleResponse data = (ReadWriteMultipleResponse) res;
 		
 		byte[] recvData = data.getMessage();
-		CCU825Test.dumpBytes("recv", recvData);
+		//CCU825Test.dumpBytes("recv", recvData);
 		
 		assert( recvData.length == nRead*2+1 );
 		

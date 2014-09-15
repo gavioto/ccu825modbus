@@ -53,8 +53,10 @@ public class CCU825Connection {
 
 	private boolean dataDumpEnabled = false;
 
+	private boolean packetDumpEnabled = true;
+
 	/**
-	 * Init a connection. Does nothing.
+	 * Initialize a connection. Does nothing.
 	 * 
 	 * @param mc ModbBus connection implementation, used just for fn23 io
 	 * @param key communications encryption key. Contact radsel to get one. Have your device IMEI handy.
@@ -64,6 +66,8 @@ public class CCU825Connection {
 	public CCU825Connection( ModBusConnection mc, byte [] key  ) {
 		this.mc = mc;
 		this.key = key;
+		
+		//dataDumpEnabled = true;
 	}
 
 	/**
@@ -90,6 +94,13 @@ public class CCU825Connection {
 		mc.setSpeed(9600);		
 	}
 
+	/** 
+	 * Actually just calls underlying ModBus connector disconnect().
+	 */
+	public void disconnect()
+	{
+		mc.disconnect();
+	}
 
 	/** 
 	 * Do a protocol transaction sending and receiving one packet.
@@ -101,6 +112,8 @@ public class CCU825Connection {
 	
 	private CCU825Packet exchange( CCU825Packet send ) throws CCU825ProtocolException
 	{
+		if( packetDumpEnabled  ) CCU825Test.dumpBytes( "send packet pl", send.getPacketPayload() );
+
 		send.setSeqNum( currentSeq++ );
 		send.setAckNum( currentAck );
 		//send.setAckNum( lastRecvSeq );
@@ -125,24 +138,12 @@ public class CCU825Connection {
 			System.arraycopy(payload, 0, packetBytes, 8, writeBytes-8);
 		}
 
+		int recvShortsCount = 125; // (CCU825Packet.MAXPACKET+1)/2
 
 		if( dataDumpEnabled ) CCU825Test.dumpBytes( "modbus send", packetBytes );
-		byte[] rcv = mc.rwMultiple( CCU825Packet.MAXPACKET+1/2, packetBytes );
+		byte[] rcv = mc.rwMultiple( recvShortsCount , packetBytes );
 		if( dataDumpEnabled) CCU825Test.dumpBytes( "modbus recv", rcv );
 
-
-		/*
-		byte[] rpd;
-		if(encryptionEnabled)
-		{
-			RC4 dec = new RC4(key);
-			rpd = dec.decrypt(rcv);
-			
-			System.arraycopy(rcv, 0, rpd, 0, 8); // header is unencrypted
-		}
-		else
-			rpd = rcv;
-		*/
 		
 		CCU825Packet rp = new CCU825Packet(rcv,key);
 
@@ -163,6 +164,9 @@ public class CCU825Connection {
 
 		currentAck++;
 
+		if( packetDumpEnabled  ) CCU825Test.dumpBytes( "recv packet pl", rp.getPacketPayload() );
+		if( packetDumpEnabled  ) System.out.println(rp);
+		
 		return rp;
 	}
 
@@ -235,6 +239,7 @@ public class CCU825Connection {
 
 		if( tries == 0 ) throw new CCU825Exception("Can't get device info");
 
+		System.out.println(deviceInfo);
 		// Now switch to encrypted mode
 		setEncryptionEnabled(true);
 		
@@ -285,8 +290,7 @@ public class CCU825Connection {
 
 
 	/**
-	 * Does a request to get SysInfo.
-	 * 
+	 * Does a request to get general controller state - inputs, outputs, etc.
 	 * @return System information (i/o state etc) at the current moment
 	 * @throws CCU825ProtocolException
 	 */

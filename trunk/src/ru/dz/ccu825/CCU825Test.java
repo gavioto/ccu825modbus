@@ -5,7 +5,10 @@ import java.util.logging.Logger;
 import ru.dz.ccu825.data.CCU825ReturnCode;
 import ru.dz.ccu825.payload.CCU825SysInfo;
 import ru.dz.ccu825.push.PushOpenHAB;
+import ru.dz.ccu825.transport.ArrayKeyRing;
+import ru.dz.ccu825.transport.CCU825_j2mod_connector;
 import ru.dz.ccu825.transport.EmptyModbusConnector;
+import ru.dz.ccu825.transport.ICCU825KeyRing;
 import ru.dz.ccu825.transport.ModBusConnection;
 import ru.dz.ccu825.transport.TestChatModbusConnector;
 import ru.dz.ccu825.util.CCU825Exception;
@@ -28,12 +31,17 @@ public class CCU825Test
 	 */
 	public static void main(String[] args) {				
 		
-		ModBusConnection mc = new TestChatModbusConnector();
+		//ModBusConnection mc = new TestChatModbusConnector();
+		ModBusConnection mc = new CCU825_j2mod_connector();
+		//mc.setDestination("serial:com2");
+		
 		PushOpenHAB oh = new PushOpenHAB("localhost");
-
 		oh.setDefaultItemNames();
 		
-		byte[] key = TestChatModbusConnector.key;
+		ICCU825KeyRing kr = new ArrayKeyRing();
+		//byte[] key = TestChatModbusConnector.key;
+		byte[] key = kr.getKeyForIMEI("869158007853514"); 
+		dumpBytes("key",key);
 		
 		CCU825Connection c = new CCU825Connection(mc, key);
 		
@@ -49,7 +57,7 @@ public class CCU825Test
 		} catch (CCU825Exception e) {
 			//e.printStackTrace();
 			log.severe(e.getMessage());
-			return;
+			System.exit(33);
 		}
 
 		
