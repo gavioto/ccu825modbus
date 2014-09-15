@@ -5,6 +5,7 @@ import java.nio.ByteOrder;
 import java.util.Iterator;
 
 import ru.dz.ccu825.CCU825Packet;
+import ru.dz.ccu825.data.ArmModeChange;
 import ru.dz.ccu825.util.CCU825PacketFormatException;
 
 /**
@@ -15,6 +16,7 @@ import ru.dz.ccu825.util.CCU825PacketFormatException;
 
 public class CCU825EventsEx extends AbstractEvents  {
 
+	
 	public CCU825EventsEx(byte [] in ) throws CCU825PacketFormatException {
 		ByteBuffer bb = ByteBuffer.wrap(in);
 
@@ -25,6 +27,10 @@ public class CCU825EventsEx extends AbstractEvents  {
 
 		si = new CCU825SysInfoEx(bb);
 
+		armDetail = new ArmModeChange(in, 45);
+		disarmDetail = new ArmModeChange(in, 62);
+		protectDetail = new ArmModeChange(in, 79);
+		
 		nEvents = in[189];
 		events = new byte[nEvents];
 		System.arraycopy(in, 190, events, 0, nEvents);

@@ -2,11 +2,18 @@ package ru.dz.ccu825.payload;
 
 import java.util.Iterator;
 
+import ru.dz.ccu825.data.ArmModeChange;
+
 
 public abstract class AbstractEvents implements Iterable<Byte>, ICCU825Events {
 
 	protected byte nEvents;
 	protected byte[] events;
+	
+	protected ArmModeChange armDetail;
+	protected ArmModeChange disarmDetail;
+	protected ArmModeChange protectDetail;
+	
 	protected ICCU825SysInfo si;
 
 	public static String eventName(byte _event) {
@@ -61,6 +68,9 @@ public abstract class AbstractEvents implements Iterable<Byte>, ICCU825Events {
 		
 		case 82:	return "FW update attempt";
 		case 83:	return "GPRS connection requested";
+
+		case 84:	return "Device turned on";
+		case 85:	return "Device restarted";
 		}
 		
 		return String.format("?%02x", e );
@@ -89,6 +99,8 @@ public abstract class AbstractEvents implements Iterable<Byte>, ICCU825Events {
 			if(i.hasNext()) sb.append( ", " );
 		}
 	
+		// TODO arm/disarm/protect details
+		
 		return sb.toString();
 	}
 
@@ -128,6 +140,21 @@ public abstract class AbstractEvents implements Iterable<Byte>, ICCU825Events {
 			throw new RuntimeException("CCU825EventIterator delete() not possible");
 		}
 
+	}
+
+
+
+
+	public ArmModeChange getArmDetail() {
+		return armDetail;
+	}
+
+	public ArmModeChange getDisarmDetail() {
+		return disarmDetail;
+	}
+
+	public ArmModeChange getProtectDetail() {
+		return protectDetail;
 	}
 	
 	
