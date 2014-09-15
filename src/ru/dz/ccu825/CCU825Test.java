@@ -2,7 +2,7 @@ package ru.dz.ccu825;
 
 import java.util.logging.Logger;
 
-import ru.dz.ccu825.payload.CCU825ReturnCode;
+import ru.dz.ccu825.data.CCU825ReturnCode;
 import ru.dz.ccu825.payload.CCU825SysInfo;
 import ru.dz.ccu825.push.PushOpenHAB;
 import ru.dz.ccu825.transport.EmptyModbusConnector;
