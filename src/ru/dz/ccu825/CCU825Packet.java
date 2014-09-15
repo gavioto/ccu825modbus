@@ -19,14 +19,22 @@ import ru.dz.ccu825.util.RC4;
 public class CCU825Packet {
 	private final static Logger log = Logger.getLogger(CCU825Packet.class.getName());
 
+	/** Maximum size of packet payload, bytes. */
+	//private static final int PKT_MAX_PAYLOAD = 1545;
 
-	private static final int PKT_MAX_PAYLOAD = 1545;
+	/** Maximum size of packet payload, bytes. */
+	private static final int PKT_MAX_PAYLOAD = 250-10;
+	
+	/** Packet header length, bytes. */
 	private static final int PKT_HEADER_LEN = 8;
 
 	public static final int MAXPACKET = PKT_MAX_PAYLOAD + PKT_HEADER_LEN + 1; // + 1 to make it even
 	
+	/** Packet header flag, packet is encrypted. */
 	public static final byte PKT_FLAG_ENC = 0x01;
+	/** Packet header flag, packet is a part of a sync sequence. */
 	public static final byte PKT_FLAG_SYN = 0x02;
+	/** Packet header flag, packet is a device reply in a sync sequence. */
 	public static final byte PKT_FLAG_ACK = 0x04;
 
 
@@ -68,7 +76,7 @@ public class CCU825Packet {
 	 * Construct packet object from raw protocol data received from ModBus IO transaction.
 	 * 
 	 * @param data What we've got from ModBus fn23 
-	 * @param key 
+	 * @param key Encryption key. You can get one from RADSEL support, hopefully.
 	 * 
 	 * @throws CCU825CheckSumException
 	 * @throws CCU825PacketFormatException
@@ -150,6 +158,10 @@ public class CCU825Packet {
 	}
 	
 	
+	/**
+	 * Set packet's ENC (encrypted) header flag.
+	 * @param b set or reset
+	 */
 
 	public void setEnc(boolean encryptionEnabled) {
 		if( encryptionEnabled )
@@ -190,8 +202,8 @@ public class CCU825Packet {
 	 * Check if packet length field is correct. 
 	 * 
 	 * @param data Packet data bytes
-	 * @param recvLen 
-	 * @return Actual payload length
+	 * @param recvLen length field from packet 
+	 * @return Actual <b>payload</b> length
 	 * @throws CCU825PacketFormatException Length value is insane
 	 */
 	
@@ -207,7 +219,7 @@ public class CCU825Packet {
 	 * Check if packet checksum is correct.
 	 * NB! Clears checksum bytes in packet!
 	 * @param data Packet data.
-	 * @param recvCheckSum 
+	 * @param recvCheckSum checksum field of the packet. 
 	 * @throws CCU825CheckSumException Checksum was wrong.
 	 */
 	
@@ -222,16 +234,16 @@ public class CCU825Packet {
 		{
 			String msg = String.format( "got checksum=%04X in pkt, calculated=%04X", recvCheckSum, calcCheckSum );
 			log.severe( msg );
-			//throw new CCU825CheckSumException("got checksum=" + Integer.toHexString(recvCheckSum) + " in pkt, calculated="+ Integer.toHexString(calcCheckSum) );
 			throw new CCU825CheckSumException( msg );
 		}
 	}
 
 	
-	/** Calc a checksum for a packet.
+	/** 
+	 * Calculate a checksum for a packet.
 	 * 
 	 * @param data packet
-	 * @param len 
+	 * @param len length of packet, bytes.
 	 * @return 16 bits of a checksum
 	 */
 	
@@ -276,18 +288,8 @@ public class CCU825Packet {
 		out[4] = 0; // csum  
 		out[5] = 0; //   
 
-		//out[6] = (byte) ( payload.length & 0xFF );  
-		//out[7] = (byte) ((payload.length >> 8) & 0xFF );    		
 		bb.putShort(6, (short)payload.length);
 
-		/* do it just before returning array for send code
-		int calcCheckSum = makeCheckSum(out,outSize);
-		
-		//out[4] = (byte) ( calcCheckSum & 0xFF );  
-		//out[5] = (byte) ((calcCheckSum >> 8) & 0xFF );    		
-		bb.putShort(4, (short)calcCheckSum);
-		*/
-		
 		data = out;
 		dataSize = outSize;
 	}
@@ -302,10 +304,21 @@ public class CCU825Packet {
 	public int getSeqNum() { return data[2]; }
 	public int getAckNum() { return data[3]; }
 
+	@Override
+	public String toString()
+	{		
+		ByteBuffer bb = ByteBuffer.wrap(data);
+		bb.order(ByteOrder.LITTLE_ENDIAN);
 
-
-
-
-
+		short pktLen = bb.getShort(6);
+		//short pktCs = bb.getShort(4);
+	
+		return String.format("pkt len %d, %s%s%s", pktLen,
+				isEnc() ? "Enc " : "",
+				isSyn() ? "Syn " : "",
+				isAck() ? "Ack " : ""
+				);
+	}
+	
 	
 }

@@ -15,7 +15,7 @@ import ru.dz.ccu825.util.CCU825PacketFormatException;
 
 public class CCU825SysInfo extends AbstractSysInfo  {
 
-	
+	/** Number of controller inputs, TODO must be 14 */
 	public static final int N_IN = 8;
 	
 	
@@ -80,5 +80,6 @@ public class CCU825SysInfo extends AbstractSysInfo  {
 	
 	@Override
 	public int nInputs() {		return N_IN;	}
+
 	
 }

@@ -3,7 +3,7 @@
  * 
  * Value objects representing specific types of values in CCU825 packets.
  * <p>
- * Implemented: GuardState
+ * Implemented: GuardState, GuardEvent (incomplete)
  * <p> 
  * TODO: return code, battery state, guard mode change request source, event id
  * 
