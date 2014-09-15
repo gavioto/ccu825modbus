@@ -6,6 +6,8 @@ import ru.dz.ccu825.payload.CCU825DeviceInfo;
 import ru.dz.ccu825.payload.CCU825OutState;
 import ru.dz.ccu825.payload.CCU825ReturnCode;
 import ru.dz.ccu825.payload.CCU825SysInfo;
+import ru.dz.ccu825.payload.CCU825SysInfoEx;
+import ru.dz.ccu825.payload.ICCU825SysInfo;
 import ru.dz.ccu825.pkt.CCU825DeviceInfoAckPacket;
 import ru.dz.ccu825.pkt.CCU825DeviceInfoReqPacket;
 import ru.dz.ccu825.pkt.CCU825OutStateCmdPacket;
@@ -273,14 +275,23 @@ public class CCU825Connection {
 
 
 	/**
-	 * Does a request
-	 * @return sysinfo (i/o state etc) at the current moment
+	 * Does a request to get SysInfo.
+	 * 
+	 * @return System information (i/o state etc) at the current moment
 	 * @throws CCU825ProtocolException
 	 */
-	public CCU825SysInfo getSysInfo() throws CCU825ProtocolException 
+	public ICCU825SysInfo getSysInfo() throws CCU825ProtocolException 
 	{
 		CCU825Packet rp = exchange(new CCU825SysInfoReqPacket() );
-		return new CCU825SysInfo(rp.getPacketPayload());
+		switch( rp.getPacketPayload()[0] )
+		{
+		case CCU825Packet.PKT_TYPE_SYSINFO:
+			return new CCU825SysInfo(rp.getPacketPayload());
+		case CCU825Packet.PKT_TYPE_SYSINFO_EX:
+			return new CCU825SysInfoEx(rp.getPacketPayload());
+		}
+		
+		throw new CCU825PacketFormatException(String.format("sysInfo payload type is %X", rp.getPacketPayload()[0]));
 	}
 
 	/**

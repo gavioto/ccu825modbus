@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 
 import ru.dz.ccu825.CCU825Test;
 import ru.dz.ccu825.payload.CCU825SysInfo;
+import ru.dz.ccu825.payload.ICCU825SysInfo;
 
 /**
  * Push data to OpenHAB instance with http requests.
@@ -51,7 +52,7 @@ public class PushOpenHAB {
 	}
 
 
-	public void sendSysInfo( CCU825SysInfo si )
+	public void sendSysInfo( ICCU825SysInfo si )
 	{
 		for( int i = 0; i < CCU825SysInfo.N_IN; i++ )
 		{

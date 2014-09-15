@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import ru.dz.ccu825.payload.CCU825SysInfo;
+import ru.dz.ccu825.payload.ICCU825SysInfo;
 import ru.dz.ccu825.util.CCU825PacketFormatException;
 
 public class CCU825SysInfoTest {
@@ -24,7 +25,7 @@ public class CCU825SysInfoTest {
 
 		
 		
-		CCU825SysInfo si = new CCU825SysInfo(pl);
+		ICCU825SysInfo si = new CCU825SysInfo(pl);
 		
 		System.err.println(si);
 		
