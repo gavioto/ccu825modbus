@@ -17,6 +17,7 @@ import ru.dz.ccu825.pkt.CCU825EventsReqPacket;
 import ru.dz.ccu825.pkt.CCU825OutStateCmdPacket;
 import ru.dz.ccu825.pkt.CCU825SysInfoReqPacket;
 import ru.dz.ccu825.pkt.CCU825ZeroLenghPacket;
+import ru.dz.ccu825.transport.ICCU825KeyRing;
 import ru.dz.ccu825.transport.ModBusConnection;
 import ru.dz.ccu825.util.CCU825Exception;
 import ru.dz.ccu825.util.CCU825PacketFormatException;
@@ -39,8 +40,10 @@ public class CCU825Connection {
 
 	private static final int NTRIES = 5;
 
-	private ModBusConnection mc;
-	private byte[] key;
+	private final ModBusConnection mc;
+	private final ICCU825KeyRing keyRing;
+	/** communications encryption key. Contact radsel to get one. Have your device IMEI handy. */
+	private byte[] key = null;
 
 	private int currentSeq = 0;
 	private int currentAck = 0;
@@ -55,17 +58,18 @@ public class CCU825Connection {
 
 	private boolean packetDumpEnabled = true;
 
+
 	/**
 	 * Initialize a connection. Does nothing.
 	 * 
 	 * @param mc ModbBus connection implementation, used just for fn23 io
-	 * @param key communications encryption key. Contact radsel to get one. Have your device IMEI handy.
+	 * @param keyRing Source to get a key for a given IMEI from
 	 * @throws CCU825Exception Mostly due to communication or protocol errors.
 	 */
 
-	public CCU825Connection( ModBusConnection mc, byte [] key  ) {
+	public CCU825Connection( ModBusConnection mc, ICCU825KeyRing keyRing  ) {
 		this.mc = mc;
-		this.key = key;
+		this.keyRing = keyRing;
 		
 		//dataDumpEnabled = true;
 	}
@@ -128,6 +132,8 @@ public class CCU825Connection {
 
 		if(encryptionEnabled)
 		{
+			assert(key != null);
+			
 			byte[] payload = new byte[writeBytes-8];
 			System.arraycopy(packetBytes,8,payload,0,writeBytes-8);
 			
@@ -240,7 +246,9 @@ public class CCU825Connection {
 		if( tries == 0 ) throw new CCU825Exception("Can't get device info");
 
 		System.out.println(deviceInfo);
-		// Now switch to encrypted mode
+		// Now find out an encryption key and switch to encrypted mode
+		key = keyRing.getKeyForIMEI(deviceInfo.getIMEI());
+		if( key == null ) throw new CCU825ProtocolException("No key for IMEI="+deviceInfo.getIMEI());
 		setEncryptionEnabled(true);
 		
 		// 3. Ack devinfo and get return code

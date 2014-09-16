@@ -40,10 +40,10 @@ public class CCU825Test
 		
 		ICCU825KeyRing kr = new ArrayKeyRing();
 		//byte[] key = TestChatModbusConnector.key;
-		byte[] key = kr.getKeyForIMEI("869158007853514"); 
-		dumpBytes("key",key);
+		//byte[] key = kr.getKeyForIMEI("869158007853514"); 
+		//dumpBytes("key",key);
 		
-		CCU825Connection c = new CCU825Connection(mc, key);
+		CCU825Connection c = new CCU825Connection(mc, kr);
 		
 		try {
 		
