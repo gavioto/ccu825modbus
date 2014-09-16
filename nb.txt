@@ -1,2 +1,4 @@
 - fn23 recv word count must be 125, or it doesn't work
 
+- if payload len is odd, add zero byte to the end of payload and increment payload len in pkt header!
+

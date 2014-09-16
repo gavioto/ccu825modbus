@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import ru.dz.ccu825.data.CCU825ReturnCode;
 import ru.dz.ccu825.payload.CCU825SysInfo;
+import ru.dz.ccu825.payload.ICCU825Events;
 import ru.dz.ccu825.payload.ICCU825SysInfo;
 import ru.dz.ccu825.push.PushOpenHAB;
 import ru.dz.ccu825.transport.ArrayKeyRing;
@@ -67,12 +68,20 @@ public class CCU825Test
 		
 		//System.out.println(c.getDeviceInfo());
 	
+		try {
+			ICCU825Events events = c.getEvents();
+			System.out.println(events);
+		} catch (CCU825ProtocolException e1) {
+			e1.printStackTrace();
+		}
 		
-		for( int i = 20; i > 0; i-- )
+		for( int i = 10; i > 0; i-- )
 		{
 			try {
 				// TODO controller gets crazy and stops communications (modbus exceptions) if we do this
 				//c.setOutState(i, 0x7F);
+				
+				c.setOutState(i, 0x03);
 				
 				ICCU825SysInfo si = c.getSysInfo();
 				//oh.sendSysInfo(si);

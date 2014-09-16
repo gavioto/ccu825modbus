@@ -347,7 +347,7 @@ public class CCU825Packet {
 		short pktLen = bb.getShort(6);
 		//short pktCs = bb.getShort(4);
 	
-		return String.format("pkt len %d, %s%s%s", pktLen,
+		return String.format("pkt len %d, seq %d ack %d %s%s%s", pktLen, getSeqNum(), getAckNum(),
 				isEnc() ? "Enc " : "",
 				isSyn() ? "Syn " : "",
 				isAck() ? "Ack " : ""

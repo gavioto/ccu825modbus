@@ -34,8 +34,11 @@ public abstract class AbstractEvents implements Iterable<Byte>, ICCU825Events {
 		StringBuilder sb = new StringBuilder(nEvents*20); // estimate size
 
 		sb.append("Last arm    : "+armDetail);
+		sb.append("; ");
 		sb.append("Last disarm : "+disarmDetail);
+		sb.append("; ");
 		sb.append("Last protect: "+protectDetail);
+		sb.append("; ");
 		
 		Iterator<Byte> i = iterator();
 		while(i.hasNext())
