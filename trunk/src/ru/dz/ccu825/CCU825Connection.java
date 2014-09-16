@@ -49,7 +49,7 @@ public class CCU825Connection {
 	private int currentSeq = 0;
 	private int currentAck = 0;
 
-	private int lastRecvSeq;
+	private int lastRecvSeq = 0;
 
 	private CCU825DeviceInfo deviceInfo;
 
@@ -73,7 +73,7 @@ public class CCU825Connection {
 		this.keyRing = keyRing;
 		
 		//dataDumpEnabled = true;
-		//packetDumpEnabled = true;
+		packetDumpEnabled = true;
 	}
 
 	/**
@@ -118,40 +118,18 @@ public class CCU825Connection {
 	
 	private CCU825Packet exchange( CCU825Packet send ) throws CCU825ProtocolException
 	{
-		if( packetDumpEnabled  ) CCU825Test.dumpBytes( "send packet pl", send.getPacketPayload() );
 
 		send.setSeqNum( currentSeq++ );
 		send.setAckNum( currentAck );
 		//send.setAckNum( lastRecvSeq );
+		//currentAck++;
 
 		send.setEnc(encryptionEnabled);
 
+		//if( packetDumpEnabled  ) CCU825Test.dumpBytes( "send packet pl", send.getPacketPayload() );
+		if( packetDumpEnabled  ) System.out.println(send);
+		
 		byte [] packetBytes = send.getPacketBytes(key);
-
-		//int writeBytes = packetBytes.length;
-
-		//assert( (writeBytes & 1) == 0 );
-
-		/*
-		if(encryptionEnabled)
-		{
-			assert(key != null);
-			
-			byte[] payload = new byte[writeBytes-8];
-			System.arraycopy(packetBytes,8,payload,0,writeBytes-8);
-			
-			RC4 enc = new RC4(key);
-			payload = enc.encrypt(payload);
-			
-			//spd = new byte[writeBytes];
-			System.arraycopy(payload, 0, packetBytes, 8, writeBytes-8);
-		}
-		*/
-		
-		// Set last byte to zero! Encryption might set it to nonzero value
-		//if(send.isUnaligned())
-		//	packetBytes[packetBytes.length-1] = 0;
-		
 		int recvShortsCount = 125; // (CCU825Packet.MAXPACKET+1)/2
 
 		//dumpReimport(packetBytes);
@@ -180,7 +158,7 @@ public class CCU825Connection {
 
 		currentAck++;
 
-		if( packetDumpEnabled  ) CCU825Test.dumpBytes( "recv packet pl", rp.getPacketPayload() );
+		//if( packetDumpEnabled  ) CCU825Test.dumpBytes( "recv packet pl", rp.getPacketPayload() );
 		if( packetDumpEnabled  ) System.out.println(rp);
 		
 		return rp;
@@ -347,15 +325,23 @@ public class CCU825Connection {
 	public ICCU825Events getEvents() throws CCU825ProtocolException 
 	{
 		CCU825Packet rp = exchange(new CCU825EventsReqPacket() );
-		switch( rp.getPacketPayload()[0] )
+		byte[] packetPayload = rp.getPacketPayload();
+		
+		switch( packetPayload[0] )
 		{
 		case CCU825Packet.PKT_TYPE_EVENTS:
-			return new CCU825Events(rp.getPacketPayload());
+			return new CCU825Events(packetPayload);
+			
 		case CCU825Packet.PKT_TYPE_EVENTS_EX:
-			return new CCU825EventsEx(rp.getPacketPayload());
+			return new CCU825EventsEx(packetPayload);
+			
+		case CCU825Packet.PKT_TYPE_EMPTY:
+			return null;
 		}
+	
+		//CCU825Test.dumpBytes("unknown events payload", packetPayload);
 		
-		throw new CCU825PacketFormatException(String.format("Events payload type is %X", rp.getPacketPayload()[0]));
+		throw new CCU825PacketFormatException(String.format("Events payload type is %X", packetPayload[0]));
 	}
 	
 	
