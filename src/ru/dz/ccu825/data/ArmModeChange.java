@@ -43,6 +43,12 @@ public class ArmModeChange
 		return ident;
 	}
 
-	// TODO tostring
+	@Override
+	public String toString() {
+		if(ident != null)
+			return "Arm mode change src="+src+" ("+ident+")";
+		else
+			return "Arm mode change src="+src;
+	}
 
 }

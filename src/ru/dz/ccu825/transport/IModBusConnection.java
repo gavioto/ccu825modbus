@@ -1,6 +1,5 @@
 package ru.dz.ccu825.transport;
 
-import ru.dz.ccu825.CCU825Packet;
 import ru.dz.ccu825.util.CCU825Exception;
 import ru.dz.ccu825.util.CCU825ProtocolException;
 
@@ -9,13 +8,12 @@ import ru.dz.ccu825.util.CCU825ProtocolException;
  * <p> 
  * Just one function, interface is simplified to minimum.
  * <p>
- * TODO rename to IModBusConnection
  *   
  * @author dz
  *
  */
 
-public interface ModBusConnection {
+public interface IModBusConnection {
 	// RADSEL reads 250 bytes for some reason, we try to read 
 	// CCU825Packet.MAXPACKET which is protocol-defined max
 	// packet size 

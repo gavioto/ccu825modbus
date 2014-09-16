@@ -9,7 +9,7 @@ import ru.dz.ccu825.transport.ArrayKeyRing;
 import ru.dz.ccu825.transport.CCU825_j2mod_connector;
 import ru.dz.ccu825.transport.EmptyModbusConnector;
 import ru.dz.ccu825.transport.ICCU825KeyRing;
-import ru.dz.ccu825.transport.ModBusConnection;
+import ru.dz.ccu825.transport.IModBusConnection;
 import ru.dz.ccu825.transport.TestChatModbusConnector;
 import ru.dz.ccu825.util.CCU825Exception;
 import ru.dz.ccu825.util.CCU825ProtocolException;
@@ -32,7 +32,7 @@ public class CCU825Test
 	public static void main(String[] args) {				
 		
 		//ModBusConnection mc = new TestChatModbusConnector();
-		ModBusConnection mc = new CCU825_j2mod_connector();
+		IModBusConnection mc = new CCU825_j2mod_connector();
 		//mc.setDestination("serial:com2");
 		
 		PushOpenHAB oh = new PushOpenHAB("localhost");

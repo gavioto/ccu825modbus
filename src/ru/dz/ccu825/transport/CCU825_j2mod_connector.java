@@ -19,7 +19,7 @@ import com.ghgande.j2mod.modbus.msg.ModbusResponse;
 import com.ghgande.j2mod.modbus.msg.ReadWriteMultipleResponse;
 import com.ghgande.j2mod.modbus.net.ModbusMasterFactory;
 
-public class CCU825_j2mod_connector implements ModBusConnection {
+public class CCU825_j2mod_connector implements IModBusConnection {
 	private ModbusTransport transport = null;
 	//private String dest = "tcp:localhost:502";
 	private String dest = "device:com2";

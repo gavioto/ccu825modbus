@@ -32,7 +32,11 @@ public abstract class AbstractEvents implements Iterable<Byte>, ICCU825Events {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder(nEvents*20); // estimate size
-	
+
+		sb.append("Last arm    : "+armDetail);
+		sb.append("Last disarm : "+disarmDetail);
+		sb.append("Last protect: "+protectDetail);
+		
 		Iterator<Byte> i = iterator();
 		while(i.hasNext())
 		{
@@ -40,8 +44,6 @@ public abstract class AbstractEvents implements Iterable<Byte>, ICCU825Events {
 			
 			if(i.hasNext()) sb.append( ", " );
 		}
-	
-		// TODO arm/disarm/protect details
 		
 		return sb.toString();
 	}

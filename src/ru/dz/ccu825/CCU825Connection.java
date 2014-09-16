@@ -18,7 +18,7 @@ import ru.dz.ccu825.pkt.CCU825OutStateCmdPacket;
 import ru.dz.ccu825.pkt.CCU825SysInfoReqPacket;
 import ru.dz.ccu825.pkt.CCU825ZeroLenghPacket;
 import ru.dz.ccu825.transport.ICCU825KeyRing;
-import ru.dz.ccu825.transport.ModBusConnection;
+import ru.dz.ccu825.transport.IModBusConnection;
 import ru.dz.ccu825.util.CCU825Exception;
 import ru.dz.ccu825.util.CCU825PacketFormatException;
 import ru.dz.ccu825.util.CCU825ProtocolException;
@@ -40,7 +40,7 @@ public class CCU825Connection {
 
 	private static final int NTRIES = 5;
 
-	private final ModBusConnection mc;
+	private final IModBusConnection mc;
 	private final ICCU825KeyRing keyRing;
 	/** communications encryption key. Contact radsel to get one. Have your device IMEI handy. */
 	private byte[] key = null;
@@ -67,7 +67,7 @@ public class CCU825Connection {
 	 * @throws CCU825Exception Mostly due to communication or protocol errors.
 	 */
 
-	public CCU825Connection( ModBusConnection mc, ICCU825KeyRing keyRing  ) {
+	public CCU825Connection( IModBusConnection mc, ICCU825KeyRing keyRing  ) {
 		this.mc = mc;
 		this.keyRing = keyRing;
 		

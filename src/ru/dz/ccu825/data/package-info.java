@@ -5,7 +5,7 @@
  * <p>
  * Implemented: GuardState, GuardEvent (incomplete)
  * <p> 
- * TODO: return code, battery state, guard mode change request source, event id
+ * TODO: battery state, event id
  * 
  * @author dz
  *

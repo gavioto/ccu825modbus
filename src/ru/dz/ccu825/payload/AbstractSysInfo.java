@@ -22,6 +22,8 @@ public abstract class AbstractSysInfo implements ICCU825SysInfo
 
 	abstract void decodePayload(ByteBuffer bb);
 
+	// TODO decodeS1, decodeS2
+	
 	@Override
 	public String toString() {
 		

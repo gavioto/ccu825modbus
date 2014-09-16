@@ -7,7 +7,7 @@ package ru.dz.ccu825.transport;
  *
  */
 
-public class TestChatModbusConnector implements ModBusConnection {
+public class TestChatModbusConnector implements IModBusConnection {
 
 	public static byte[] key = { 0x2A, 0x70, 0x67, 0x2E, 0x22, 0x33, 0x24, 0x04, 0x59, 0x58, 0x04, 0x15, 0x15, 0x3A, 0x43, 0x00 };
 
