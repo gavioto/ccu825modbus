@@ -87,7 +87,7 @@ public final class CCU825_ReadWriteMultipleRequest extends ModbusRequest {
 		results[5] = (byte) (m_WriteReference & 0xFF);
 		results[6] = (byte) (m_WriteCount >> 8);
 		results[7] = (byte) (m_WriteCount & 0xFF);
-		// TODO is it correct ModBus? possibly odd byte count
+		// TO DO is it correct ModBus? possibly odd byte count
 		//results[8] = (byte) (sendData.length);
 		results[8] = (byte) (m_WriteCount * 2);
 		int offset = 9;

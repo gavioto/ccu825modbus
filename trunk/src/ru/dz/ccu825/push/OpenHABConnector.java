@@ -34,10 +34,8 @@ public class OpenHABConnector {
 		try {
 			ii.parseItemsXML(il.toString());
 		} catch (SAXException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

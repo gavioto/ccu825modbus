@@ -57,7 +57,7 @@ public class CCU825Connection {
 
 	private boolean dataDumpEnabled = false;
 
-	private boolean packetDumpEnabled = true;
+	private boolean packetDumpEnabled = false;
 
 
 	/**
@@ -72,7 +72,8 @@ public class CCU825Connection {
 		this.mc = mc;
 		this.keyRing = keyRing;
 		
-		dataDumpEnabled = true;
+		//dataDumpEnabled = true;
+		//packetDumpEnabled = true;
 	}
 
 	/**
@@ -153,7 +154,7 @@ public class CCU825Connection {
 		
 		int recvShortsCount = 125; // (CCU825Packet.MAXPACKET+1)/2
 
-		dumpReimport(packetBytes);
+		//dumpReimport(packetBytes);
 		
 		if( dataDumpEnabled ) CCU825Test.dumpBytes( "modbus send", packetBytes );
 		byte[] rcv = mc.rwMultiple( recvShortsCount , packetBytes );
