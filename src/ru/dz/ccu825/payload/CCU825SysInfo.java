@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import ru.dz.ccu825.CCU825Packet;
+import ru.dz.ccu825.data.BatteryState;
 import ru.dz.ccu825.util.CCU825PacketFormatException;
 
 /**
@@ -54,26 +55,28 @@ public class CCU825SysInfo extends AbstractSysInfo  {
 			inValue [i] = ((double)bb.getShort(i+2)) * 10.0 / 4095; 
 		}
 
-		{
-		byte S1 = bb.get(19);
-		powerOk = (S1 & 0x08) != 0;		
-		balanceValid = (S1 & 0x04) != 0;
-		}
+		decodeS1(bb.get(19));
+		decodeS2(bb.get(20));
 		
-		{
-		byte S2 = bb.get(20);
-		caseOpen = (S2 & 0x01) != 0;
-		}
-		
-		powerVoltage = ((double)bb.get(21))/10.0;
-		
-		batteryPercentage = bb.get(22);
-		
-		deviceTemperature = bb.get(23);
-		
+		powerVoltage = ((double)bb.get(21))/10.0;		
+		batteryPercentage = bb.get(22);		
+		deviceTemperature = bb.get(23);		
 		GSMBalance = Float.intBitsToFloat( bb.getInt(24) );
 	}
 
+	private void decodeS1(byte S1)
+	{
+		powerOk = (S1 & 0x08) != 0;		
+		balanceValid = (S1 & 0x04) != 0;
+		deviceTemperatureValid = (S1 & 0x80) != 0;
+		batteryState = BatteryState.fromStateBits(S1>>4);
+		armStateBits = S1 & 0x03;
+	}
+
+	private void decodeS2(byte S2)
+	{
+		caseOpen = (S2 & 0x01) != 0;
+	}
 	
 	
 	@Override
