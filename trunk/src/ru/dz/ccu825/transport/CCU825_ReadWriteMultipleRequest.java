@@ -77,6 +77,7 @@ public final class CCU825_ReadWriteMultipleRequest extends ModbusRequest {
 	 * getMessage -- return a prepared message.
 	 */
 	public byte[] getMessage() {
+		//byte results[] = new byte[9 + sendData.length];
 		byte results[] = new byte[9 + 2 * m_WriteCount];
 		results[0] = (byte) (m_ReadReference >> 8);
 		results[1] = (byte) (m_ReadReference & 0xFF);
@@ -86,6 +87,8 @@ public final class CCU825_ReadWriteMultipleRequest extends ModbusRequest {
 		results[5] = (byte) (m_WriteReference & 0xFF);
 		results[6] = (byte) (m_WriteCount >> 8);
 		results[7] = (byte) (m_WriteCount & 0xFF);
+		// TODO is it correct ModBus? possibly odd byte count
+		//results[8] = (byte) (sendData.length);
 		results[8] = (byte) (m_WriteCount * 2);
 		int offset = 9;
 		for (int i = 0; i < sendData.length; i++) {

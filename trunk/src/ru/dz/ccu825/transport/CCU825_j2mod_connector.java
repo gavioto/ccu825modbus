@@ -87,6 +87,8 @@ public class CCU825_j2mod_connector implements IModBusConnection {
 	public byte[] rwMultiple(int nRead, byte[] writeData) throws CCU825ProtocolException 
 	{
 
+		// TODO ok with odd len?
+		
 		if( (writeData.length & 1) != 0 )
 		{
 			//System.err.println("odd packet size, byte lost!");
@@ -101,7 +103,7 @@ public class CCU825_j2mod_connector implements IModBusConnection {
 		
 		CCU825_ReadWriteMultipleRequest req = new CCU825_ReadWriteMultipleRequest( nRead, writeData.length/2 );
 		
-		req.setUnitID(1);	
+		req.setUnitID(1); // TODO set unit address	
 		req.setSendData(writeData);
 		
 		// 4. Prepare the transaction

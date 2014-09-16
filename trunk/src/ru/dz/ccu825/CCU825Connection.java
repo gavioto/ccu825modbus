@@ -19,6 +19,7 @@ import ru.dz.ccu825.pkt.CCU825SysInfoReqPacket;
 import ru.dz.ccu825.pkt.CCU825ZeroLenghPacket;
 import ru.dz.ccu825.transport.ICCU825KeyRing;
 import ru.dz.ccu825.transport.IModBusConnection;
+import ru.dz.ccu825.util.CCU825CheckSumException;
 import ru.dz.ccu825.util.CCU825Exception;
 import ru.dz.ccu825.util.CCU825PacketFormatException;
 import ru.dz.ccu825.util.CCU825ProtocolException;
@@ -71,7 +72,7 @@ public class CCU825Connection {
 		this.mc = mc;
 		this.keyRing = keyRing;
 		
-		//dataDumpEnabled = true;
+		dataDumpEnabled = true;
 	}
 
 	/**
@@ -124,12 +125,13 @@ public class CCU825Connection {
 
 		send.setEnc(encryptionEnabled);
 
-		byte [] packetBytes = send.getPacketBytes();
+		byte [] packetBytes = send.getPacketBytes(key);
 
-		int writeBytes = packetBytes.length;
+		//int writeBytes = packetBytes.length;
 
-		assert( (writeBytes & 1) == 0 );
+		//assert( (writeBytes & 1) == 0 );
 
+		/*
 		if(encryptionEnabled)
 		{
 			assert(key != null);
@@ -143,9 +145,16 @@ public class CCU825Connection {
 			//spd = new byte[writeBytes];
 			System.arraycopy(payload, 0, packetBytes, 8, writeBytes-8);
 		}
-
+		*/
+		
+		// Set last byte to zero! Encryption might set it to nonzero value
+		//if(send.isUnaligned())
+		//	packetBytes[packetBytes.length-1] = 0;
+		
 		int recvShortsCount = 125; // (CCU825Packet.MAXPACKET+1)/2
 
+		dumpReimport(packetBytes);
+		
 		if( dataDumpEnabled ) CCU825Test.dumpBytes( "modbus send", packetBytes );
 		byte[] rcv = mc.rwMultiple( recvShortsCount , packetBytes );
 		if( dataDumpEnabled) CCU825Test.dumpBytes( "modbus recv", rcv );
@@ -177,6 +186,24 @@ public class CCU825Connection {
 	}
 
 	/**
+	 * Check packets we send to make sure everything is ok with CRC
+	 * @param packetBytes packet bytes
+	 */
+	private void dumpReimport(byte[] packetBytes) {
+		try {
+			CCU825Packet re = new CCU825Packet(packetBytes, key);
+			
+			System.out.println("reimport: "+re.toString());
+			
+		} catch (CCU825CheckSumException e) {
+			e.printStackTrace();
+		} catch (CCU825PacketFormatException e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+	/**
 	 * Do an initial protocol transactions (handshake) as defined 
 	 * in CCU825-SM protocol spec. from 5 September 2014, firmware ver. 01.02
 	 * 
@@ -203,18 +230,11 @@ public class CCU825Connection {
 
 				CCU825Packet rp = exchange( sp );
 
-				byte[] rdata = rp.getPacketBytes();
-
-				/*
-				if( rdata[0] != CCU825Packet.PKT_TYPE_EMPTY )
-					logErr("wrong packet type" + rdata[0] );
-				*/
 				if( !rp.isSyn() )
-					throw new CCU825PacketFormatException("no syn in reply" + rdata[1]);
-				//logErr("no syn in reply" + rdata[1] );
+					throw new CCU825PacketFormatException("no syn in reply" + rp);
 
 				if( !rp.isAck() )
-					throw new CCU825PacketFormatException("no ack in reply" + rdata[1]);
+					throw new CCU825PacketFormatException("no ack in reply" + rp);
 
 				break;
 
@@ -246,6 +266,7 @@ public class CCU825Connection {
 		if( tries == 0 ) throw new CCU825Exception("Can't get device info");
 
 		System.out.println(deviceInfo);
+		
 		// Now find out an encryption key and switch to encrypted mode
 		key = keyRing.getKeyForIMEI(deviceInfo.getIMEI());
 		if( key == null ) throw new CCU825ProtocolException("No key for IMEI="+deviceInfo.getIMEI());
