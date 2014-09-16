@@ -52,7 +52,7 @@ public class PushOpenHAB {
 	}
 
 
-	public void sendSysInfo( ICCU825SysInfo si )
+	public void sendSysInfo( ICCU825SysInfo si ) throws IOException
 	{
 		for( int i = 0; i < CCU825SysInfo.N_IN; i++ )
 		{
@@ -72,14 +72,20 @@ public class PushOpenHAB {
 	}
 
 
-	private void sendValue(String name, String string) {
+	/**
+	 * Not supposed to be used from outside. Public for unit test. 
+	 * @param name Item name
+	 * @param string Item value to send
+	 * @throws IOException 
+	 */
+	public void sendValue(String name, String string) throws IOException {
 		try {
 			URL url = makeUrl(name,string);
 			callUrl(url);
 		} catch(IOException e)
 		{
-			log.severe(e.getMessage());
-			//e.printStackTrace();
+			log.severe("IO Error: "+e.getMessage());
+			throw e;
 		}
 	}
 
@@ -96,7 +102,7 @@ public class PushOpenHAB {
 		while ((inputLine = in.readLine()) != null) 
 		{
 			log.finest("callUrl="+inputLine);
-			//System.out.println(inputLine);
+			System.out.println(inputLine);
 		}
 		
 		in.close();
@@ -104,7 +110,7 @@ public class PushOpenHAB {
 
 
 	private URL makeUrl(String name, String value) throws MalformedURLException {
-		return new URL("http", openHABHostName, 8080, String.format("CMD?%s=%s ", openHABHostName, name, value ) );
+		return new URL("http", openHABHostName, 8080, String.format("/CMD?%s=%s ", name, value ) );
 		//return new URL( String.format("http://%s:8080/CMD?%s=%s ", openHABHostName, name, value ) );
 	}
 

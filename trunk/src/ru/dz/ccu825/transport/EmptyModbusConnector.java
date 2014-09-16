@@ -6,7 +6,7 @@ package ru.dz.ccu825.transport;
  *
  */
 
-public class EmptyModbusConnector implements ModBusConnection {
+public class EmptyModbusConnector implements IModBusConnection {
 
 	@Override
 	public void setSpeed(int baud) {

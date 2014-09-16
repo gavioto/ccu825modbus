@@ -52,7 +52,6 @@ public class CCU825SysInfoEx extends AbstractSysInfo  {
 			inValue [i] = ((double)bb.getShort(i+3)) * 10.0 / 4095; 
 		}
 		
-		// TODO extract as sub-object
 		{
 		byte S1 = bb.get(36);
 		powerOk = (S1 & 0x08) != 0;		
