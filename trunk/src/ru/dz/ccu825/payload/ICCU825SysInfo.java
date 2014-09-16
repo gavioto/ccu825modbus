@@ -1,5 +1,7 @@
 package ru.dz.ccu825.payload;
 
+import ru.dz.ccu825.data.BatteryState;
+
 public interface ICCU825SysInfo {
 
 	/**
@@ -37,5 +39,9 @@ public interface ICCU825SysInfo {
 	public abstract double getPowerVoltage();
 
 	public abstract double getGSMBalance();
+
+	public abstract BatteryState getBatteryState();
+
+	public abstract boolean isDeviceTemperatureValid();
 
 }

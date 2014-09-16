@@ -2,19 +2,27 @@ package ru.dz.ccu825.payload;
 
 import java.nio.ByteBuffer;
 
+import ru.dz.ccu825.data.BatteryState;
+
 public abstract class AbstractSysInfo implements ICCU825SysInfo
 {
 
-	protected  int inBits;
-	protected  int outBits;
-	protected  double[] inValue;
-	protected  boolean powerOk;
-	protected  boolean balanceValid;
-	protected  boolean caseOpen;
-	protected  byte batteryPercentage;
-	protected  byte deviceTemperature;
-	protected  double powerVoltage;
-	protected  double GSMBalance;
+	protected int inBits;
+	protected int outBits;
+	
+	protected double[] inValue;
+	
+	protected boolean powerOk;
+	protected boolean balanceValid;
+	protected boolean caseOpen;
+	protected boolean deviceTemperatureValid;
+	protected BatteryState batteryState;
+	
+	protected byte batteryPercentage;
+	protected byte deviceTemperature;
+	protected double powerVoltage;
+	protected double GSMBalance;
+	protected int armStateBits = 0;
 
 	AbstractSysInfo() {
 		super();
@@ -22,11 +30,11 @@ public abstract class AbstractSysInfo implements ICCU825SysInfo
 
 	abstract void decodePayload(ByteBuffer bb);
 
-	// TODO decodeS1, decodeS2
-	
+
+
 	@Override
 	public String toString() {
-		
+
 		return 
 				"In bits "+inBits+" out bits "+outBits+" GSM balance "+GSMBalance+" battery "+batteryPercentage+"% temp "+deviceTemperature+" voltage "+
 				powerVoltage
@@ -65,5 +73,15 @@ public abstract class AbstractSysInfo implements ICCU825SysInfo
 
 	@Override
 	public double getGSMBalance() {		return GSMBalance;	}
+
+	@Override
+	public boolean isDeviceTemperatureValid() {
+		return deviceTemperatureValid;
+	}
+
+	@Override
+	public BatteryState getBatteryState() {
+		return batteryState;
+	}
 
 }
