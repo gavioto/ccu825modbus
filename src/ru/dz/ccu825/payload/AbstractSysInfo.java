@@ -35,10 +35,14 @@ public abstract class AbstractSysInfo implements ICCU825SysInfo
 	@Override
 	public String toString() {
 
+		return String.format("In %4X Out %2X GSM bal %2.0f Battery %d%% Temp %d Voltage %.1f", inBits, outBits, GSMBalance, batteryPercentage, deviceTemperature, powerVoltage );
+
+		/*
 		return 
 				"In bits "+inBits+" out bits "+outBits+" GSM balance "+GSMBalance+" battery "+batteryPercentage+"% temp "+deviceTemperature+" voltage "+
 				powerVoltage
 				;
+		*/
 	}
 
 	@Override

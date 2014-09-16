@@ -300,7 +300,7 @@ public class CCU825Packet {
 		
 		int outSize = payload.length + PKT_HEADER_LEN;
 		
-		// TODO odd pkt size?
+		// TO DO odd pkt size?
 		unaligned = (outSize & 0x01 ) != 0;
 		if( unaligned )			outSize++;
 		

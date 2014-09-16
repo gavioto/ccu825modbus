@@ -87,7 +87,7 @@ public class CCU825_j2mod_connector implements IModBusConnection {
 	public byte[] rwMultiple(int nRead, byte[] writeData) throws CCU825ProtocolException 
 	{
 
-		// TODO ok with odd len?
+		// TO DO ok with odd len?
 		
 		if( (writeData.length & 1) != 0 )
 		{

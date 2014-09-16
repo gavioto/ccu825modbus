@@ -56,7 +56,7 @@ public class CCU825SysInfoEx extends AbstractSysInfo  {
 		decodeS1(bb.get(36));
 		decodeS2(bb.get(37));
 		
-		powerVoltage = ((double)bb.get(38))/10.0;	
+		powerVoltage = (((int)bb.get(38)) & 0xFF) / 10.0;	
 		batteryPercentage = bb.get(39);		
 		deviceTemperature = bb.get(40);		
 		GSMBalance = Float.intBitsToFloat( bb.getInt(41) );

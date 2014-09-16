@@ -1,9 +1,11 @@
 package ru.dz.ccu825;
 
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import ru.dz.ccu825.data.CCU825ReturnCode;
 import ru.dz.ccu825.payload.CCU825SysInfo;
+import ru.dz.ccu825.payload.ICCU825SysInfo;
 import ru.dz.ccu825.push.PushOpenHAB;
 import ru.dz.ccu825.transport.ArrayKeyRing;
 import ru.dz.ccu825.transport.CCU825_j2mod_connector;
@@ -30,6 +32,8 @@ public class CCU825Test
 	 * @param args
 	 */
 	public static void main(String[] args) {				
+		
+		//Thread.currentThread().setDaemon(false);
 		
 		//ModBusConnection mc = new TestChatModbusConnector();
 		IModBusConnection mc = new CCU825_j2mod_connector();
@@ -63,19 +67,26 @@ public class CCU825Test
 		
 		//System.out.println(c.getDeviceInfo());
 	
-		/*
+		
 		for( int i = 20; i > 0; i-- )
 		{
 			try {
-				CCU825SysInfo si = c.getSysInfo();
-				oh.sendSysInfo(si);
+				// TODO controller gets crazy and stops communications (modbus exceptions) if we do this
+				//c.setOutState(i, 0x7F);
+				
+				ICCU825SysInfo si = c.getSysInfo();
+				//oh.sendSysInfo(si);
 				System.out.println(si);
 			} catch (CCU825ProtocolException e) {
 				//e.printStackTrace();
 				log.severe(e.getMessage());
+			//} catch (IOException e) {
+			//	e.printStackTrace();
 			}			
 		}
-		*/
+
+		System.exit(0);
+
 	}
 
 
