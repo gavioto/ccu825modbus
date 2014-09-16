@@ -1,11 +1,13 @@
-package ru.dz.ccu825.push;
+package test.ru.dz.ccu825;
+
+import org.junit.Test;
+
+import ru.dz.ccu825.push.PollOpenHAB;
 
 public class OpenHabTest {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) 
+	@Test
+	public void testOpenHABConnector() 
 	{
 		//String tempUrl = "demo.openhab.org:8080/rest/items/Temperature_FF_Office/state";		
 		//String switchUrl = "http://demo.openhab.org:8080/rest/items/Heating_FF_Office/state";
