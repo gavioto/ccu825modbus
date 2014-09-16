@@ -8,16 +8,34 @@ package ru.dz.ccu825.data;
  *
  */
 public class GuardEvent {
+	
+	int id;
+	
+	public GuardEvent(int id) {
+		this.id = id;
+	}
+
+	
+	
+	public int getId() {
+		return id;
+	}
+
+	
+	@Override
+	public String toString() {
+		return eventName(id);
+	}
+
 
 	/**
 	 * Return human-readable event name.
 	 * 
-	 * @param _event event type byte
+	 * @param e event type byte
 	 * @return event name
 	 */
-	public static String eventName(byte _event) {
-		int e = _event;
-		
+	public static String eventName(int e) {
+
 		e &= 0xFF; // positive
 		
 		if( (e >= 0) && (e < 8) )

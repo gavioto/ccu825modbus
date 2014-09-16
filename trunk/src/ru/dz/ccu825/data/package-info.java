@@ -3,9 +3,10 @@
  * 
  * Value objects representing specific types of values in CCU825 packets.
  * <p>
- * Implemented: GuardState, GuardEvent (incomplete)
+ * Implemented: GuardState, GuardEvent, BatteryState, ArmModeChange, ArmModeChangeSource,
+ * ReturnCode.
  * <p> 
- * TODO: battery state, event id
+ * 
  * 
  * @author dz
  *

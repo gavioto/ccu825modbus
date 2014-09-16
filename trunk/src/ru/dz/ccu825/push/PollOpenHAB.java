@@ -109,7 +109,7 @@ public class PollOpenHAB {
 		try
 		{
 			URL url = makeUrl(item);
-			String val = callUrl(url);
+			String val = OpenHABConnector.callUrl(url);
 			System.out.println("item "+item+"="+val);
 			return val;
 		}
@@ -132,33 +132,6 @@ public class PollOpenHAB {
 		return new URL("http", openHABHostName, 8080, String.format("/rest/items/%s/state", name ) );
 	}
 	
-	/**
-	 * Make (an http) call to URL, return answer collected
-	 * @param url URL to visit
-	 * @return Web page text
-	 * @throws IOException
-	 */
-	private String callUrl(URL url) throws IOException 
-	{
-		URLConnection yc = url.openConnection();
-
-		BufferedReader in = new BufferedReader(
-				new InputStreamReader(
-						yc.getInputStream()));
-
-		StringBuffer bb = new StringBuffer(); 
-		{
-			String inputLine;
-
-			while ((inputLine = in.readLine()) != null) 
-				bb.append(inputLine);
-		}
-
-		in.close();
-
-		return bb.toString();
-	}
-
 
 
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+import ru.dz.ccu825.push.OpenHABConnector;
 import ru.dz.ccu825.push.PollOpenHAB;
 import ru.dz.ccu825.push.PushOpenHAB;
 
@@ -20,12 +21,12 @@ import ru.dz.ccu825.push.PushOpenHAB;
 public class OpenHabTest {
 	static final String hostName = "demo.openhab.org";
 
-	/*
 	@Test
-	public void testOpenHABConnector() 
+	public void testOpenHABConnector() throws IOException 
 	{
+		OpenHABConnector c = new OpenHABConnector(hostName);
+		c.getItemsList();
 	}
-	*/
 	
 	@Test
 	public void testOpenHABPoll() 
