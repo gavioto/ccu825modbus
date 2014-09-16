@@ -69,8 +69,8 @@ public class CCU825Packet {
 	private byte[] data;
 	private byte[] payload;
 
-
 	private int dataSize;
+	private boolean unaligned = false;
 	
 	/**
 	 * Construct packet object from raw protocol data received from ModBus IO transaction.
@@ -82,12 +82,15 @@ public class CCU825Packet {
 	 * @throws CCU825PacketFormatException
 	 */
 	
-	public CCU825Packet( byte [] data, byte[] key ) throws CCU825CheckSumException, CCU825PacketFormatException {
-		if( data.length < PKT_HEADER_LEN )
+	public CCU825Packet( byte [] iData, byte[] key ) throws CCU825CheckSumException, CCU825PacketFormatException {
+		if( iData.length < PKT_HEADER_LEN )
 			throw new CCU825PacketFormatException("packet len < " + PKT_HEADER_LEN);
 
-		if( data[0] != 0x01 )
+		if( iData[0] != 0x01 )
 			throw new CCU825PacketFormatException("Wrong header byte");
+		
+		byte[] data = new byte[iData.length];
+		System.arraycopy(iData, 0, data, 0, iData.length);
 		
 		ByteBuffer bb = ByteBuffer.wrap(data);
 		bb.order(ByteOrder.LITTLE_ENDIAN);
@@ -121,7 +124,35 @@ public class CCU825Packet {
 	 * @return packet bytes.
 	 */
 
-	public byte[] getPacketBytes() {
+	public byte[] getPacketBytes(byte[] key) {
+		
+		if(isEnc())
+		{
+			assert(key != null);
+			
+			byte[] _payload;
+			//byte[] _payload = new byte[dataSize-8];
+			//System.arraycopy(data,8,_payload,0,dataSize-8);
+			
+			RC4 enc = new RC4(key);
+			_payload = enc.encrypt(payload);
+			
+			//System.arraycopy(_payload, 0, data, 8, dataSize-8);
+			System.arraycopy(_payload, 0, data, 8, _payload.length);
+		}
+
+		int payLen = payload.length;
+
+		// Set last byte to zero! Encryption might set it to nonzero value
+		if(isUnaligned())
+		{
+			data[data.length-1] = 0;
+			payLen++;
+		}
+		
+		data[6] = (byte) ( payLen & 0xFF );  
+		data[7] = (byte) ((payLen >> 8) & 0xFF );    		
+		
 		data[4] = 0;
 		data[5] = 0;
 		
@@ -264,19 +295,21 @@ public class CCU825Packet {
 
 		assert( payload.length <= PKT_MAX_PAYLOAD );
 		
-		this.payload = payload;
+		this.payload = new byte[payload.length];
+		System.arraycopy(payload, 0, this.payload, 0, payload.length);
 		
 		int outSize = payload.length + PKT_HEADER_LEN;
 		
-		if( (outSize & 0x01 ) != 0 )
-			outSize++;
+		// TODO odd pkt size?
+		unaligned = (outSize & 0x01 ) != 0;
+		if( unaligned )			outSize++;
 		
 		byte[] out = new byte[outSize];
 		
 		System.arraycopy(payload, 0, out, PKT_HEADER_LEN, payload.length);
 		
-		ByteBuffer bb = ByteBuffer.wrap(out);
-		bb.order(ByteOrder.LITTLE_ENDIAN);
+		//ByteBuffer bb = ByteBuffer.wrap(out);
+		//bb.order(ByteOrder.LITTLE_ENDIAN);
 
 		
 		out[0] = 0x01;
@@ -288,7 +321,8 @@ public class CCU825Packet {
 		out[4] = 0; // csum  
 		out[5] = 0; //   
 
-		bb.putShort(6, (short)payload.length);
+		// payload len is +1 if odd, do it in pkt assembly
+		//bb.putShort(6, (short)payload.length);
 
 		data = out;
 		dataSize = outSize;
@@ -318,6 +352,14 @@ public class CCU825Packet {
 				isSyn() ? "Syn " : "",
 				isAck() ? "Ack " : ""
 				);
+	}
+
+
+	/** 
+	 * @return True if original payload size was odd and we added one pad byte to the end
+	 */
+	public boolean isUnaligned() {
+		return unaligned;
 	}
 	
 	

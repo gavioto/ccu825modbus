@@ -1,0 +1,1 @@
+- fn23 recv word count must be 125, or it doesn't work

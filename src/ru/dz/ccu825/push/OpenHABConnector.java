@@ -8,6 +8,10 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.logging.Logger;
 
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
+
 public class OpenHABConnector {
 
 	private final static Logger log = Logger.getLogger(OpenHABConnector.class.getName());
@@ -23,8 +27,19 @@ public class OpenHABConnector {
 	{
 		URL il = new URL("http", openHABHostName, 8080, "/rest/items");  
 		
-		String xr = callUrl(il);
-		System.out.println(xr);
+		//String xr = callUrl(il);
+		//System.out.println(xr);
+		
+		OpenHABItemsInfo ii = new OpenHABItemsInfo();
+		try {
+			ii.parseItemsXML(il.toString());
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**
