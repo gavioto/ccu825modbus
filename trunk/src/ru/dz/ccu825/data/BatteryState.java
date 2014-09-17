@@ -2,6 +2,13 @@ package ru.dz.ccu825.data;
 
 import java.util.logging.Logger;
 
+/**
+ * 
+ * CCU825 battery state enum.
+ * 
+ * @author dz
+ *
+ */
 public enum BatteryState {
 	BatteryNotUsed,
 	BatteryNotConnected,

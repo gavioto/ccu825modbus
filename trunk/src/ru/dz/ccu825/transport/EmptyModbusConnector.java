@@ -1,7 +1,7 @@
 package ru.dz.ccu825.transport;
 
 /**
- * Empty connector to test code with no comm at all.
+ * Empty connector to test code with no communications at all.
  * @author dz
  *
  */
@@ -25,4 +25,12 @@ public class EmptyModbusConnector implements IModBusConnection {
 		return new byte[0];
 	}
 
+	@Override
+	public void setModbusUnitId(int unit) {
+	}
+
+	@Override
+	public void setDestination(String dest) {
+	}
+	
 }

@@ -2,6 +2,12 @@ package ru.dz.ccu825.payload;
 
 import ru.dz.ccu825.data.BatteryState;
 
+/**
+ * sysInfo/sysInfoEx interface.
+ * 
+ * @author dz
+ *
+ */
 public interface ICCU825SysInfo {
 
 	/**

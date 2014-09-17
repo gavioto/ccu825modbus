@@ -36,7 +36,7 @@ public class CCU825Test
 		
 		//Thread.currentThread().setDaemon(false);
 		
-		//ModBusConnection mc = new TestChatModbusConnector();
+
 		IModBusConnection mc = new CCU825_j2mod_connector();
 		//mc.setDestination("serial:com2");
 		
@@ -54,7 +54,14 @@ public class CCU825Test
 		
 			CCU825ReturnCode protocolRC = c.connect();
 			
-			System.out.println("RC = " + protocolRC );			
+			System.out.println("RC = " + protocolRC );
+			
+			if(!protocolRC.isOk())
+			{
+				log.severe("Bad return code");
+				System.exit(33);
+			}
+			
 			System.out.println( c.getDeviceInfo() );
 			
 			//System.out.println( c.getSysInfo() );
@@ -65,6 +72,7 @@ public class CCU825Test
 			System.exit(33);
 		}
 
+		
 		
 		//System.out.println(c.getDeviceInfo());
 	

@@ -3,6 +3,10 @@ package ru.dz.ccu825.transport;
 
 /**
  * Test connector providing hanshake test packets.
+ * <p>
+ * This connector replies to a handshake packets with pre-recorded 
+ * handshake answers. Used in unit tests.
+ * 
  * @author dz
  *
  */
@@ -17,14 +21,27 @@ public class TestChatModbusConnector implements IModBusConnection {
 
 	@Override
 	public void setSpeed(int baud) {
+		// Ignore		
+	}
+
+	@Override
+	public void setModbusUnitId(int unit) {
+		// Ignore		
+	}
+
+	@Override
+	public void setDestination(String dest) {
+		// Ignore		
 	}
 
 	@Override
 	public void connect() {
+		// Ignore		
 	}
 
 	@Override
 	public void disconnect() {
+		// Ignore		
 	}
 
 	@Override
@@ -66,5 +83,6 @@ public class TestChatModbusConnector implements IModBusConnection {
 		
 		return new byte[0];
 	}
+
 
 }

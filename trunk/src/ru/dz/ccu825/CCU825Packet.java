@@ -19,10 +19,10 @@ import ru.dz.ccu825.util.RC4;
 public class CCU825Packet {
 	private final static Logger log = Logger.getLogger(CCU825Packet.class.getName());
 
-	/** Maximum size of packet payload, bytes. */
+	/** Maximum size of packet payload, bytes. As written in protocol definition. */
 	//private static final int PKT_MAX_PAYLOAD = 1545;
 
-	/** Maximum size of packet payload, bytes. */
+	/** Maximum size of packet payload, bytes. As really works. */
 	private static final int PKT_MAX_PAYLOAD = 250-10;
 	
 	/** Packet header length, bytes. */
@@ -65,7 +65,7 @@ public class CCU825Packet {
 	
 
 	
-
+	/** Complete packet data. On reception checksum bytes are cleared. */
 	private byte[] data;
 	private byte[] payload;
 
@@ -75,11 +75,11 @@ public class CCU825Packet {
 	/**
 	 * Construct packet object from raw protocol data received from ModBus IO transaction.
 	 * 
-	 * @param data What we've got from ModBus fn23 
-	 * @param key Encryption key. You can get one from RADSEL support, hopefully.
+	 * @param iData What we've got from ModBus fn23 
+	 * @param key Encryption key. See README.
 	 * 
-	 * @throws CCU825CheckSumException
-	 * @throws CCU825PacketFormatException
+	 * @throws CCU825CheckSumException If checksum does not match.
+	 * @throws CCU825PacketFormatException If something is really wrong, like size or prefix.
 	 */
 	
 	public CCU825Packet( byte [] iData, byte[] key ) throws CCU825CheckSumException, CCU825PacketFormatException {
@@ -109,6 +109,7 @@ public class CCU825Packet {
 		payload = new byte[plen];
 		System.arraycopy(data, PKT_HEADER_LEN, payload, 0, plen);
 		
+		// Encoded? Decode here.
 		if( isEnc() )
 		{
 			RC4 dec = new RC4(key);
@@ -120,39 +121,40 @@ public class CCU825Packet {
 
 
 	/**
-	 * Get raw packet to send to ModBus fn23.
+	 * Prepare raw packet to send to ModBus fn23.
 	 * @return packet bytes.
 	 */
 
 	public byte[] getPacketBytes(byte[] key) {
 		
+		// Encryption is requested? Do.
 		if(isEnc())
 		{
 			assert(key != null);
 			
 			byte[] _payload;
-			//byte[] _payload = new byte[dataSize-8];
-			//System.arraycopy(data,8,_payload,0,dataSize-8);
 			
 			RC4 enc = new RC4(key);
 			_payload = enc.encrypt(payload);
 			
-			//System.arraycopy(_payload, 0, data, 8, dataSize-8);
 			System.arraycopy(_payload, 0, data, 8, _payload.length);
 		}
 
 		int payLen = payload.length;
 
-		// Set last byte to zero! Encryption might set it to nonzero value
+		// Last byte is paddind for an odd length payload?
+		// Set last byte to zero! Encryption might set it to nonzero value.
 		if(isUnaligned())
 		{
 			data[data.length-1] = 0;
 			payLen++;
 		}
 		
+		// Payload length, INCLUDING PAD BYTE
 		data[6] = (byte) ( payLen & 0xFF );  
 		data[7] = (byte) ((payLen >> 8) & 0xFF );    		
 		
+		// Clear checksum field for calculating checksum.
 		data[4] = 0;
 		data[5] = 0;
 		
@@ -160,7 +162,6 @@ public class CCU825Packet {
 		
 		data[4] = (byte) ( calcCheckSum & 0xFF );  
 		data[5] = (byte) ((calcCheckSum >> 8) & 0xFF );    		
-		//bb.putShort(4, (short)calcCheckSum);
 		
 		return data;
 	}
@@ -191,7 +192,7 @@ public class CCU825Packet {
 	
 	/**
 	 * Set packet's ENC (encrypted) header flag.
-	 * @param b set or reset
+	 * @param encryptionEnabled set or reset
 	 */
 
 	public void setEnc(boolean encryptionEnabled) {
@@ -248,7 +249,8 @@ public class CCU825Packet {
 	
 	/**
 	 * Check if packet checksum is correct.
-	 * NB! Clears checksum bytes in packet!
+	 * <b>NB! Clears checksum bytes in packet!</b>
+	 * 
 	 * @param data Packet data.
 	 * @param recvCheckSum checksum field of the packet. 
 	 * @throws CCU825CheckSumException Checksum was wrong.
@@ -264,7 +266,7 @@ public class CCU825Packet {
 		if( calcCheckSum != (recvCheckSum & 0xFFFF) )
 		{
 			String msg = String.format( "got checksum=%04X in pkt, calculated=%04X", recvCheckSum, calcCheckSum );
-			log.severe( msg );
+			log.warning( msg );
 			throw new CCU825CheckSumException( msg );
 		}
 	}
@@ -286,8 +288,8 @@ public class CCU825Packet {
 	
 	/**
 	 * Construct packet for transmission from flags byte and payload. 
-	 * @param flags
-	 * @param payload
+	 * @param flags - usually zero, except for handshake.
+	 * @param payload - data bytes to transmit.
 	 */
 	
 	
@@ -300,17 +302,13 @@ public class CCU825Packet {
 		
 		int outSize = payload.length + PKT_HEADER_LEN;
 		
-		// TO DO odd pkt size?
+		// Odd pkt size? Pad.
 		unaligned = (outSize & 0x01 ) != 0;
 		if( unaligned )			outSize++;
 		
 		byte[] out = new byte[outSize];
 		
 		System.arraycopy(payload, 0, out, PKT_HEADER_LEN, payload.length);
-		
-		//ByteBuffer bb = ByteBuffer.wrap(out);
-		//bb.order(ByteOrder.LITTLE_ENDIAN);
-
 		
 		out[0] = 0x01;
 		out[1] = flags;
@@ -321,23 +319,28 @@ public class CCU825Packet {
 		out[4] = 0; // csum  
 		out[5] = 0; //   
 
-		// payload len is +1 if odd, do it in pkt assembly
-		//bb.putShort(6, (short)payload.length);
-
 		data = out;
 		dataSize = outSize;
 	}
 
 
 
-
+	/** Set packet sequential number. <b>For protocol code internal use only.</b> */
 	public void setSeqNum(int seq) { data[2] = (byte)seq; }
+	/** Set packet acknowledge number. <b>For protocol code internal use only.</b> */
 	public void setAckNum(int seq) { data[3] = (byte)seq; }
 
 
+	/** Get packet sequential number. <b>For protocol code internal use only.</b> */
 	public int getSeqNum() { return data[2]; }
+	/** Get packet acknowledge number. <b>For protocol code internal use only.</b> */
 	public int getAckNum() { return data[3]; }
 
+	/** 
+	 * Dump packet header state. 
+	 * 
+	 * @return String describing this packet header.
+	 */
 	@Override
 	public String toString()
 	{		
@@ -356,7 +359,9 @@ public class CCU825Packet {
 
 
 	/** 
-	 * @return True if original payload size was odd and we added one pad byte to the end
+	 * Original payload length was odd. Used by protocol code.
+	 * 
+	 * @return True if original payload size was odd and we added one pad byte to the end.
 	 */
 	public boolean isUnaligned() {
 		return unaligned;

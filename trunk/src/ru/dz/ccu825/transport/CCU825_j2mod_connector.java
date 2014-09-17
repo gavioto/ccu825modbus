@@ -19,22 +19,47 @@ import com.ghgande.j2mod.modbus.msg.ModbusResponse;
 import com.ghgande.j2mod.modbus.msg.ReadWriteMultipleResponse;
 import com.ghgande.j2mod.modbus.net.ModbusMasterFactory;
 
+
 public class CCU825_j2mod_connector implements IModBusConnection {
 	private ModbusTransport transport = null;
 	//private String dest = "tcp:localhost:502";
 	private String dest = "device:com2";
 	private int baud = 9600;
+	private int unit = 1;
 
 	@Override
 	public void setSpeed(int baud) {
-		// ignore for tcp
+		this.baud = baud; 
 	}
 
+	/**
+	 * Set target address, such as serial
+	 * RS485 device port, TCP/IP address or so. 
+	 * <p>
+	 * Examples:
+	 * <li>"device:com2" - serial port on Windows
+	 * <li>"tcp:localhost:502" - modbus/tcp server on localhost port 502 
+	 * <li>"udp:localhost:502" - modbus/udp server on localhost port 502 
+	 * 
+	 * @param dest Address to connect to.
+	 */
 	public void setDestination(String dest) {
 		this.dest = dest;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see ru.dz.ccu825.transport.IModBusConnection#setModbusUnitId(int)
+	 */
+	@Override
+	public void setModbusUnitId(int unit) {
+		this.unit = unit;
+	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see ru.dz.ccu825.transport.IModBusConnection#connect()
+	 */
 	@Override
 	public void connect() throws CCU825Exception {
 
@@ -71,6 +96,7 @@ public class CCU825_j2mod_connector implements IModBusConnection {
 
 	}
 
+	
 	@Override
 	public void disconnect() {
 		try {
@@ -86,12 +112,8 @@ public class CCU825_j2mod_connector implements IModBusConnection {
 	@Override
 	public byte[] rwMultiple(int nRead, byte[] writeData) throws CCU825ProtocolException 
 	{
-
-		// TO DO ok with odd len?
-		
 		if( (writeData.length & 1) != 0 )
 		{
-			//System.err.println("odd packet size, byte lost!");
 			byte[] replacement = new byte[writeData.length+1];
 			
 			replacement[replacement.length-1] = 0;
@@ -103,7 +125,7 @@ public class CCU825_j2mod_connector implements IModBusConnection {
 		
 		CCU825_ReadWriteMultipleRequest req = new CCU825_ReadWriteMultipleRequest( nRead, writeData.length/2 );
 		
-		req.setUnitID(1); // TODO set unit address	
+		req.setUnitID(unit);	
 		req.setSendData(writeData);
 		
 		// 4. Prepare the transaction
