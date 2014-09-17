@@ -3,6 +3,15 @@ package ru.dz.ccu825.transport;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 
+ * Simple in-memory keyring implementation. Add your keys with
+ * addKey().
+ * 
+ * @author dz
+ *
+ */
+
 public class ArrayKeyRing implements ICCU825KeyRing 
 {
 
@@ -19,6 +28,12 @@ public class ArrayKeyRing implements ICCU825KeyRing
 		return keys.get(IMEI);
 	}
 
+	/**
+	 * Put a key onto a key ring.
+	 * 
+	 * @param IMEI The key is for controller with this IMEI.
+	 * @param key Here is the key.
+	 */
 	public void addKey( String IMEI, String key )
 	{
 		byte[] bkey = javax.xml.bind.DatatypeConverter.parseHexBinary(key);

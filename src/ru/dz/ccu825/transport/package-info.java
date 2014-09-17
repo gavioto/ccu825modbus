@@ -3,10 +3,12 @@
  * Connectors to ModBus implementations. 
  * <p>
  * Contains:
- * <li> j2mod connector
- * <li> Empty connector: discards send, receives zero packets
+ * <li> j2mod connector, can be used for a real communications.
+ * <li> Empty connector: discards send, receives zero packets.
  * <li> Test chat connector: discards send, receives constant handshake packets.
+ * 
  * <p>
+ * <br>
  * CCU825 uses ModBus in a very specific way. ModBus regsiters are, really, 
  * do not exist on a controller side. Instead, writing to a group of modbus
  * registers transfers an upper level protocol packet to CCU825, and reading

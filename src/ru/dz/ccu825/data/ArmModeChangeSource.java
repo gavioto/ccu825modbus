@@ -1,5 +1,12 @@
 package ru.dz.ccu825.data;
 
+/**
+ * 
+ * Enumeration of sources that can cause arm mode change in CCU825.
+ * 
+ * @author dz
+ *
+ */
 public enum ArmModeChangeSource 
 {
 
@@ -24,6 +31,13 @@ public enum ArmModeChangeSource
 		this.encoding = v;
 	}
 
+	/**
+	 * 
+	 * Return enum value for corresponding protocol source id.
+	 * 
+	 * @param c CCU825 protocol arm mode change source id.
+	 * @return Enum value.
+	 */
 	static ArmModeChangeSource forCode(int c)
 	{
 		for( ArmModeChangeSource v : ArmModeChangeSource.values() )

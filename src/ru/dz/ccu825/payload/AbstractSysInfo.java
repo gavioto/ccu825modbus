@@ -4,6 +4,13 @@ import java.nio.ByteBuffer;
 
 import ru.dz.ccu825.data.BatteryState;
 
+/**
+ * 
+ * General sysInfo/sysInfoEx implementation.
+ * 
+ * @author dz
+ *
+ */
 public abstract class AbstractSysInfo implements ICCU825SysInfo
 {
 

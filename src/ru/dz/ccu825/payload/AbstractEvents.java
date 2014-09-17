@@ -5,7 +5,13 @@ import java.util.Iterator;
 import ru.dz.ccu825.data.ArmModeChange;
 import ru.dz.ccu825.data.GuardEvent;
 
-
+/**
+ * 
+ * General Events/EventsEx implementation.
+ * 
+ * @author dz
+ *
+ */
 public abstract class AbstractEvents implements Iterable<Byte>, ICCU825Events {
 
 	protected byte nEvents;
@@ -92,14 +98,17 @@ public abstract class AbstractEvents implements Iterable<Byte>, ICCU825Events {
 
 
 
+	@Override
 	public ArmModeChange getArmDetail() {
 		return armDetail;
 	}
 
+	@Override
 	public ArmModeChange getDisarmDetail() {
 		return disarmDetail;
 	}
 
+	@Override
 	public ArmModeChange getProtectDetail() {
 		return protectDetail;
 	}

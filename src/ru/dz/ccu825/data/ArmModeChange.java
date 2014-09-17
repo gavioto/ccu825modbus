@@ -2,6 +2,12 @@ package ru.dz.ccu825.data;
 
 import java.nio.charset.Charset;
 
+/**
+ * Controller arm mode change info.
+ * 
+ * @author dz
+ *
+ */
 public class ArmModeChange 
 {
 	static final Charset ascii = Charset.forName("ascii");

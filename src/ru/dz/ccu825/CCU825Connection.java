@@ -46,6 +46,8 @@ public class CCU825Connection {
 	/** communications encryption key. Contact radsel to get one. Have your device IMEI handy. */
 	private byte[] key = null;
 
+	private boolean modbusConnected = false;
+
 	private int currentSeq = 0;
 	private int currentAck = 0;
 
@@ -58,6 +60,7 @@ public class CCU825Connection {
 	private boolean dataDumpEnabled = false;
 
 	private boolean packetDumpEnabled = false;
+
 
 
 	/**
@@ -84,8 +87,11 @@ public class CCU825Connection {
 	
 	public CCU825ReturnCode connect() throws CCU825Exception
 	{
-		setupModBus();
-		mc.connect();
+		if(!modbusConnected)
+		{
+			setupModBus();
+			mc.connect();
+		}
 
 		return initProtocol();
 	}
@@ -105,7 +111,9 @@ public class CCU825Connection {
 	 */
 	public void disconnect()
 	{
-		mc.disconnect();
+		if(modbusConnected)
+			mc.disconnect();
+		modbusConnected = false;
 	}
 
 	/** 
@@ -285,12 +293,10 @@ public class CCU825Connection {
 	private static final Logger log = Logger.getLogger(CCU825Connection.class.getName()); 
 
 	private void logErr(String string) {
-		//System.err.println("Error: "+ string );
 		log.severe(string);
 	}
 
 	private void logProtoErr(CCU825ProtocolException ex) {
-		//System.err.println("Protocol err: "+ex.getMessage());
 		log.severe("Protocol err: "+ex.getMessage());
 	}
 
@@ -299,6 +305,7 @@ public class CCU825Connection {
 
 	/**
 	 * Does a request to get general controller state - inputs, outputs, etc.
+	 * 
 	 * @return System information (i/o state etc) at the current moment
 	 * @throws CCU825ProtocolException
 	 */
@@ -319,7 +326,8 @@ public class CCU825Connection {
 	/**
 	 * Does a request to get Events/EventsEx.
 	 * 
-	 * @return Events list + system information (i/o state etc) at the current moment
+	 * @return Events list + system information (i/o state etc) at the current moment 
+	 * or <b>null</b> if no events are pending.
 	 * @throws CCU825ProtocolException
 	 */
 	public ICCU825Events getEvents() throws CCU825ProtocolException 
@@ -347,6 +355,7 @@ public class CCU825Connection {
 	
 	/**
 	 * Access informaion about the device such as IMEI, HW version, etc.
+	 * No actual request is done. 
 	 * 
 	 * @return device info as we got in protocol init transaction
 	 */
