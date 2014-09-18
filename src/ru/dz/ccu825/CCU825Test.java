@@ -28,6 +28,7 @@ public class CCU825Test
 {
 	private final static Logger log = Logger.getLogger(CCU825Test.class.getName());
 
+	static IModBusConnection mc = new CCU825_j2mod_connector();
 
 	/**
 	 * @param args
@@ -35,10 +36,7 @@ public class CCU825Test
 	public static void main(String[] args) {				
 
 		//Thread.currentThread().setDaemon(false);
-
-
-		IModBusConnection mc = new CCU825_j2mod_connector();
-		//mc.setDestination("serial:com2");
+		mc.setDestination("device:com2");
 
 		PushOpenHAB oh = new PushOpenHAB("localhost");
 		oh.setDefaultItemNames();
@@ -50,66 +48,76 @@ public class CCU825Test
 
 		CCU825Connection c = new CCU825Connection(mc, kr);
 
-		try {
-
-			CCU825ReturnCode protocolRC = c.connect();
-
-			System.out.println("RC = " + protocolRC );
-
-			if(!protocolRC.isOk())
-			{
-				log.severe("Bad return code");
-				System.exit(33);
-			}
-
-			System.out.println( c.getDeviceInfo() );
-
-			//System.out.println( c.getSysInfo() );
-
-		} catch (CCU825Exception e) {
-			//e.printStackTrace();
-			log.severe(e.getMessage());
-			System.exit(33);
-		}
-
-
-
-		//System.out.println(c.getDeviceInfo());
-
-		try {
-			ICCU825Events events = c.getEvents();
-			System.out.println(events);
-		} catch (CCU825ProtocolException e1) {
-			e1.printStackTrace();
-		}
-
-		for( int i = 100; i > 0; i-- )
+		boolean doPoll = true;
+		while(doPoll)
 		{
-			try {			
-				c.setOutState(i, 0x7F);
-
-				//ICCU825SysInfo si = c.getSysInfo();
-				//oh.sendSysInfo(si);
-				//System.out.println(si);
-
-				ICCU825Events events = c.getEvents();
-				System.out.println(events);
-				if(events != null)
-				{
-					System.out.println(events.getSysInfo());
-					//oh.sendSysInfo(events.getSysInfo());
-				}
-
-			} catch (CCU825ProtocolException e) {
+			try {
+				connectAndPoll(c);
+			} catch (CCU825Exception e) {
 				//e.printStackTrace();
 				log.severe(e.getMessage());
-				//} catch (IOException e) {
-				//	e.printStackTrace();
-			}			
+				//System.exit(33);
+			}
+
+			// Reconnect on exception
+
+			c.disconnect();
 		}
 
 		System.exit(0);
 
+	}
+
+
+
+	private static void connectAndPoll(CCU825Connection c) throws CCU825Exception 
+	{
+		System.out.println( "Connecting via "+mc.getDestination() );
+
+		CCU825ReturnCode protocolRC = c.connect();
+
+		System.out.println("RC = " + protocolRC );
+
+		if(!protocolRC.isOk())
+		{
+			log.severe("Bad connect return code");
+			System.exit(33);
+		}
+
+		System.out.println( c.getDeviceInfo() );
+
+		//System.out.println( c.getSysInfo() );
+
+		pollDevice(c);
+	}
+
+
+
+	private static void pollDevice(CCU825Connection c) throws CCU825Exception {
+
+		//for( int i = 100; i > 0; i-- )
+		while(true)
+		{
+			int i = 0;
+			
+			c.setOutState(i++, 0x7F);
+
+			ICCU825SysInfo si;
+
+			ICCU825Events events = c.getEvents();
+			if(events != null)
+			{
+				System.out.println(events);
+				si = events.getSysInfo();
+			}
+			else
+			{
+				si = c.getSysInfo();
+			}
+			//oh.sendSysInfo(si);
+			System.out.println(si);
+			
+		}
 	}
 
 

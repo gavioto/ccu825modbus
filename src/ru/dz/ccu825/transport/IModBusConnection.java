@@ -31,6 +31,12 @@ public interface IModBusConnection {
 	public void setDestination(String dest);
 	
 	/**
+	 * Get target address this connection is going to connect to.
+	 * @return Implementation-specific destination.
+	 */
+	public String getDestination();
+	
+	/**
 	 * Called before connect() to set serial port parameters.
 	 * @param baud always 9600
 	 */
