@@ -49,6 +49,13 @@ public class CCU825_j2mod_connector implements IModBusConnection {
 
 	/*
 	 * (non-Javadoc)
+	 * @see ru.dz.ccu825.transport.IModBusConnection#getDestination()
+	 */
+	@Override
+	public String getDestination() {		return dest;	}
+	
+	/*
+	 * (non-Javadoc)
 	 * @see ru.dz.ccu825.transport.IModBusConnection#setModbusUnitId(int)
 	 */
 	@Override

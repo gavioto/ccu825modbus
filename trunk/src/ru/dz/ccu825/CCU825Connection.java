@@ -58,7 +58,6 @@ public class CCU825Connection {
 	private boolean encryptionEnabled = false;
 
 	private boolean dataDumpEnabled = false;
-
 	private boolean packetDumpEnabled = false;
 
 
@@ -76,7 +75,7 @@ public class CCU825Connection {
 		this.keyRing = keyRing;
 		
 		//dataDumpEnabled = true;
-		packetDumpEnabled = true;
+		//packetDumpEnabled = true;
 	}
 
 	/**
@@ -91,6 +90,7 @@ public class CCU825Connection {
 		{
 			setupModBus();
 			mc.connect();
+			modbusConnected = true; 
 		}
 
 		return initProtocol();
@@ -111,8 +111,8 @@ public class CCU825Connection {
 	 */
 	public void disconnect()
 	{
-		if(modbusConnected)
-			mc.disconnect();
+		//if(modbusConnected)
+		mc.disconnect();
 		modbusConnected = false;
 	}
 
@@ -269,7 +269,7 @@ public class CCU825Connection {
 
 		if( tries == 0 ) throw new CCU825Exception("Can't get device info");
 
-		System.out.println(deviceInfo);
+		//System.out.println(deviceInfo);
 		
 		// Now find out an encryption key and switch to encrypted mode
 		key = keyRing.getKeyForIMEI(deviceInfo.getIMEI());
@@ -454,6 +454,18 @@ public class CCU825Connection {
 	 */
 	public void setDataDumpEnabled(boolean dataDumpEnabled) {
 		this.dataDumpEnabled = dataDumpEnabled;
+	}
+
+	public boolean isPacketDumpEnabled() {
+		return packetDumpEnabled;
+	}
+
+	public void setPacketDumpEnabled(boolean packetDumpEnabled) {
+		this.packetDumpEnabled = packetDumpEnabled;
+	}
+
+	public boolean isDataDumpEnabled() {
+		return dataDumpEnabled;
 	}
 
 }

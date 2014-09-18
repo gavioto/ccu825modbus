@@ -33,4 +33,9 @@ public class EmptyModbusConnector implements IModBusConnection {
 	public void setDestination(String dest) {
 	}
 	
+	@Override
+	public String getDestination() {
+		return "(none)";
+	}
+	
 }

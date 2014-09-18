@@ -35,6 +35,11 @@ public class TestChatModbusConnector implements IModBusConnection {
 	}
 
 	@Override
+	public String getDestination() {
+		return "(test chat)";
+	}
+
+	@Override
 	public void connect() {
 		// Ignore		
 	}
