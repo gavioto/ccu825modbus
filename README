@@ -1,6 +1,7 @@
 CCU825 (and compatible) controller protocol driver
 
 1. How to use this driver.
+--------------------------
 
 To use this driver you need an encryption key for your devices.
 
@@ -25,4 +26,22 @@ Call getSysInfo(), getEvents(), setOutState(), getOutState().
 
 Call disconnect() when done. If communications fail a lot - try to resync
 with connect() again.
+
+
+
+2. How to fix j2mod library
+---------------------------
+
+j2mod 1.03 has a bug in serial RTU close method, class ModbusRTUTransport,
+which prevents serial poprt from being reopened.
+
+Corect code is here:
+
+public void close() throws IOException {
+	m_InputStream.close();
+	m_OutputStream.close();
+	
+	m_CommPort.close();
+}
+
 

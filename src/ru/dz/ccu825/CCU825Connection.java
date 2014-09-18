@@ -60,6 +60,8 @@ public class CCU825Connection {
 	private boolean dataDumpEnabled = false;
 	private boolean packetDumpEnabled = false;
 
+	private boolean deviceConnected = false;
+
 
 
 	/**
@@ -114,6 +116,7 @@ public class CCU825Connection {
 		//if(modbusConnected)
 		mc.disconnect();
 		modbusConnected = false;
+		deviceConnected = false;
 	}
 
 	/** 
@@ -218,6 +221,8 @@ public class CCU825Connection {
 	private CCU825ReturnCode initProtocol() throws CCU825Exception {
 		int tries;
 
+		currentAck = currentSeq = 0;
+		
 		// Start with no encryption
 		setEncryptionEnabled(false);
 
@@ -303,7 +308,10 @@ public class CCU825Connection {
 
 		if( tries == 0 ) throw new CCU825Exception("Can't ack device info");
 
-		return new CCU825ReturnCode( protocolRC );		
+		CCU825ReturnCode rc = new CCU825ReturnCode( protocolRC );
+		deviceConnected = rc.isOk();
+		
+		return rc;		
 	}
 
 
@@ -466,6 +474,14 @@ public class CCU825Connection {
 
 	public boolean isDataDumpEnabled() {
 		return dataDumpEnabled;
+	}
+
+	public boolean isConnected() {
+		return deviceConnected ;
+	}
+
+	public  IModBusConnection getModbusConnector() {
+		return mc;
 	}
 
 }
