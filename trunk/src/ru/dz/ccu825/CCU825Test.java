@@ -33,72 +33,78 @@ public class CCU825Test
 	 * @param args
 	 */
 	public static void main(String[] args) {				
-		
+
 		//Thread.currentThread().setDaemon(false);
-		
+
 
 		IModBusConnection mc = new CCU825_j2mod_connector();
 		//mc.setDestination("serial:com2");
-		
+
 		PushOpenHAB oh = new PushOpenHAB("localhost");
 		oh.setDefaultItemNames();
-		
+
 		ICCU825KeyRing kr = new ArrayKeyRing();
 		//byte[] key = TestChatModbusConnector.key;
 		//byte[] key = kr.getKeyForIMEI("869158007853514"); 
 		//dumpBytes("key",key);
-		
+
 		CCU825Connection c = new CCU825Connection(mc, kr);
-		
+
 		try {
-		
+
 			CCU825ReturnCode protocolRC = c.connect();
-			
+
 			System.out.println("RC = " + protocolRC );
-			
+
 			if(!protocolRC.isOk())
 			{
 				log.severe("Bad return code");
 				System.exit(33);
 			}
-			
+
 			System.out.println( c.getDeviceInfo() );
-			
+
 			//System.out.println( c.getSysInfo() );
-			
+
 		} catch (CCU825Exception e) {
 			//e.printStackTrace();
 			log.severe(e.getMessage());
 			System.exit(33);
 		}
 
-		
-		
+
+
 		//System.out.println(c.getDeviceInfo());
-	
+
 		try {
 			ICCU825Events events = c.getEvents();
 			System.out.println(events);
 		} catch (CCU825ProtocolException e1) {
 			e1.printStackTrace();
 		}
-		
-		for( int i = 10; i > 0; i-- )
+
+		for( int i = 100; i > 0; i-- )
 		{
-			try {
-				// TODO controller gets crazy and stops communications (modbus exceptions) if we do this
-				//c.setOutState(i, 0x7F);
-				
-				c.setOutState(i, 0x03);
-				
-				ICCU825SysInfo si = c.getSysInfo();
+			try {			
+				c.setOutState(i, 0x7F);
+
+				//ICCU825SysInfo si = c.getSysInfo();
 				//oh.sendSysInfo(si);
-				System.out.println(si);
+				//System.out.println(si);
+
+				ICCU825Events events = c.getEvents();
+				System.out.println(events);
+				if(events != null)
+				{
+					System.out.println(events.getSysInfo());
+					//oh.sendSysInfo(events.getSysInfo());
+				}
+
 			} catch (CCU825ProtocolException e) {
 				//e.printStackTrace();
 				log.severe(e.getMessage());
-			//} catch (IOException e) {
-			//	e.printStackTrace();
+				//} catch (IOException e) {
+				//	e.printStackTrace();
 			}			
 		}
 
@@ -115,22 +121,22 @@ public class CCU825Test
 			System.err.println(string + ", null array " );
 			return;
 		}
-		
+
 		System.err.println(string + ", len = " + b.length);
-		
+
 		int p = 0;
-		
+
 		while( p < b.length )
 		{
 			if( (p % 16) == 0 )
 				System.err.println("");
-			
+
 			byte cb = b[p++];
-			
+
 			System.err.print( String.format("%02X ", cb) );
 		}
-		
-		
+
+
 		System.err.println("");
 		System.err.println("--");
 	}

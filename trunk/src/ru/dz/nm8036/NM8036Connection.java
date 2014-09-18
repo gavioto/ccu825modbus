@@ -83,12 +83,17 @@ public class NM8036Connection
 		clientSocket.close();
 	}
 	
-	public double[] readtemperatureSensors() throws IOException
+	/**
+	 * Request data from temperature sensors. 
+	 * @return Array of sensor values, in Celsius degrees
+	 * @throws IOException
+	 */
+	public double[] readTemperatureSensors() throws IOException
 	{
 		drainInput();
 		sendByte((byte)'t');
 		
-		int nSensors = readByte();
+		int nSensors = ((int)readByte()) & 0xFF;
 		
 		if( nSensors > MAX_SENSORS )
 		{
@@ -120,7 +125,7 @@ public class NM8036Connection
 	 * @return binary data from ADC
 	 * @throws IOException
 	 */
-	public int[] readAinputs() throws IOException
+	public int[] readAnalogInputs() throws IOException
 	{
 		drainInput();
 		sendByte((byte)'s');

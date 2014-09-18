@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="WINDOWS-1251" standalone="no"?>
+<jardesc>
+    <jar path="CCU825Lib.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/ccu825modbus/ExportJar.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <javaElement handleIdentifier="=ccu825modbus/src&lt;ru.dz.ccu825"/>
+        <javaElement handleIdentifier="=ccu825modbus/src&lt;ru.dz.ccu825.payload"/>
+        <javaElement handleIdentifier="=ccu825modbus/src&lt;ru.dz.ccu825.convert"/>
+        <javaElement handleIdentifier="=ccu825modbus/src&lt;ru.dz.ccu825.data"/>
+        <javaElement handleIdentifier="=ccu825modbus/src&lt;ru.dz.ccu825.push"/>
+        <javaElement handleIdentifier="=ccu825modbus/src&lt;ru.dz.ccu825.transport"/>
+        <javaElement handleIdentifier="=ccu825modbus/src&lt;ru.dz.ccu825.test"/>
+        <javaElement handleIdentifier="=ccu825modbus/src&lt;ru.dz.ccu825.pkt"/>
+        <javaElement handleIdentifier="=ccu825modbus/src&lt;ru.dz.ccu825.util"/>
+    </selectedElements>
+</jardesc>
