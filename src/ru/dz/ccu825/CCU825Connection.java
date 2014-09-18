@@ -135,7 +135,7 @@ public class CCU825Connection {
 		send.setEnc(encryptionEnabled);
 
 		//if( packetDumpEnabled  ) CCU825Test.dumpBytes( "send packet pl", send.getPacketPayload() );
-		if( packetDumpEnabled  ) System.out.println(send);
+		if( packetDumpEnabled  ) System.out.println("send "+send);
 		
 		byte [] packetBytes = send.getPacketBytes(key);
 		int recvShortsCount = 125; // (CCU825Packet.MAXPACKET+1)/2
@@ -143,7 +143,24 @@ public class CCU825Connection {
 		//dumpReimport(packetBytes);
 		
 		if( dataDumpEnabled ) CCU825Test.dumpBytes( "modbus send", packetBytes );
-		byte[] rcv = mc.rwMultiple( recvShortsCount , packetBytes );
+		
+		byte[] rcv;
+		
+		int resend = 10;
+		while(true)
+			try {
+				rcv = mc.rwMultiple( recvShortsCount , packetBytes );
+				break;
+			} catch( CCU825ProtocolException e )
+		{
+				if(resend-- <= 0)
+					throw e;
+
+				log.severe("Resend");
+				continue;
+		}
+		
+		
 		if( dataDumpEnabled) CCU825Test.dumpBytes( "modbus recv", rcv );
 
 		
@@ -167,7 +184,7 @@ public class CCU825Connection {
 		currentAck++;
 
 		//if( packetDumpEnabled  ) CCU825Test.dumpBytes( "recv packet pl", rp.getPacketPayload() );
-		if( packetDumpEnabled  ) System.out.println(rp);
+		if( packetDumpEnabled  ) System.out.println("recv "+rp);
 		
 		return rp;
 	}

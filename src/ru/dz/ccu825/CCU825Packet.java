@@ -332,9 +332,9 @@ public class CCU825Packet {
 
 
 	/** Get packet sequential number. <b>For protocol code internal use only.</b> */
-	public int getSeqNum() { return data[2]; }
+	public int getSeqNum() { return ((int)data[2]) & 0xFF; }
 	/** Get packet acknowledge number. <b>For protocol code internal use only.</b> */
-	public int getAckNum() { return data[3]; }
+	public int getAckNum() { return ((int)data[3]) & 0xFF; }
 
 	/** 
 	 * Dump packet header state. 
