@@ -29,6 +29,7 @@ public class CCU825Test
 	private final static Logger log = Logger.getLogger(CCU825Test.class.getName());
 
 	static IModBusConnection mc = new CCU825_j2mod_connector();
+	static boolean doPoll = true;
 
 	/**
 	 * @param args
@@ -48,7 +49,22 @@ public class CCU825Test
 
 		CCU825Connection c = new CCU825Connection(mc, kr);
 
-		boolean doPoll = true;
+		AbstractRequestLoop loop = new AbstractRequestLoop(c) {
+			
+			@Override
+			protected void pollDevice(CCU825Connection c) throws CCU825Exception {
+				CCU825Test.pollDevice(c);				
+			}
+			
+			@Override
+			protected void Say(String string) {
+				System.out.println(string);				
+			}
+		};
+		
+		loop.startBlocking();
+		
+		/*
 		while(doPoll)
 		{
 			try {
@@ -63,7 +79,7 @@ public class CCU825Test
 
 			c.disconnect();
 		}
-
+		*/
 		System.exit(0);
 
 	}
@@ -88,19 +104,19 @@ public class CCU825Test
 
 		//System.out.println( c.getSysInfo() );
 
-		pollDevice(c);
+		while(doPoll)
+			pollDevice(c);
 	}
 
 
 
+	static int iOut = 0;
 	private static void pollDevice(CCU825Connection c) throws CCU825Exception {
 
 		//for( int i = 100; i > 0; i-- )
-		while(true)
 		{
-			int i = 0;
 			
-			c.setOutState(i++, 0x7F);
+			c.setOutState(iOut++, 0x7F);
 
 			ICCU825SysInfo si;
 
