@@ -107,5 +107,16 @@ public class MercuryFixed {
 		v[2] = decode4b(packet,startPos+8);
 		v[3] = decode4b(packet,startPos+12);
 	}
+
+	public static double[] multiply(double d, double[] vector) {
+		
+		int len = vector.length;
+		double [] ret = new double[len];
+		
+		for( int i = 0; i < len; i++ )
+			ret[i] = vector[i] * d;
+		
+		return ret;
+	}
 	
 }
