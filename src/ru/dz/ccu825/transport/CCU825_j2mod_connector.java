@@ -81,19 +81,15 @@ public class CCU825_j2mod_connector implements IModBusConnection {
 			if (transport instanceof ModbusSerialTransport) {
 				((ModbusSerialTransport) transport).setReceiveTimeout(500);
 				((ModbusSerialTransport) transport).setBaudRate(baud);
-				//transport.s
 			}
-			/*
-			 * There are a number of devices which won't initialize immediately
-			 * after being opened. Take a moment to let them come up.
-			 */
-			//Thread.sleep(2000);
-
 
 			if (transport instanceof ModbusTCPTransport) {
+				System.out.println("TCP - call setRtuTcp()");
+				((ModbusTCPTransport) transport).setRtuTcp();
+
 				//unit = 0;
 			} else if (transport instanceof ModbusRTUTransport) {
-				//throw new CCU825Exception("Just TCP yet");
+				//?
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();

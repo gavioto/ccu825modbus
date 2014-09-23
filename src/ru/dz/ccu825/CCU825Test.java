@@ -38,6 +38,7 @@ public class CCU825Test
 
 		//Thread.currentThread().setDaemon(false);
 		mc.setDestination("device:com2");
+		//mc.setDestination("tcp:192.168.88.145:4002");  // Doesnt work yet
 
 		PushOpenHAB oh = new PushOpenHAB("localhost");
 		oh.setDefaultItemNames();
