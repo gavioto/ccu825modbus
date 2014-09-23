@@ -13,6 +13,7 @@ import ru.dz.mercury.data.MercuryEnergy;
 import ru.dz.mercury.data.MercuryFixed;
 import ru.dz.mercury.data.MercuryFreq;
 import ru.dz.mercury.data.MercuryIV;
+import ru.dz.mercury.data.MercuryInfo;
 import ru.dz.mercury.pkt.ChannelOpenPacket;
 import ru.dz.mercury.pkt.ChannelTestPacket;
 import ru.dz.mercury.pkt.Packet;
@@ -210,7 +211,7 @@ public class Mercury230Connection
 
 
 
-	void sendParameterReadRequestPacket(int nParam) throws IOException
+	public void sendParameterReadRequestPacket(int nParam) throws IOException
 	{
 		sendPacked(new ParameterReadRequestPacket(nParam));		
 	}
@@ -314,6 +315,8 @@ public class Mercury230Connection
 		System.out.println("Device address = "+addr);
 
 		(new MercuryFreq(c)).dump();
+		(new MercuryInfo(c)).dump();
+		
 		
 		while(true)
 			getInstantPowerValues(c);
