@@ -4,13 +4,20 @@ import ru.dz.ccu825.util.CRC16;
 import ru.dz.mercury.Mercury230CRCException;
 
 public class Packet {
+	/** Used in empty packets */
+	protected static final byte [] empty = new byte[0];
+
 
 	public static final int MAX_PASSWD_LEN = 6;
 
 	protected static final int PKT_TYPE_CHANNEL_TEST = 0;
 	protected static final int PKT_TYPE_CHANNEL_OPEN = 1;
+	protected static final int PKT_TYPE_CHANNEL_CLOSE = 2; 
+	protected static final int PKT_TYPE_WRITE_PARAMETER = 3;
 	protected static final int PKT_TYPE_READ_RECORD = 4;
 	protected static final int PKT_TYPE_READ_ENERGY = 5;
+	protected static final int PKT_TYPE_READ_RAM = 6; // inaccessible, factory only
+	protected static final int PKT_TYPE_WRITE_RAM = 7; // inaccessible, factory only
 	protected static final int PKT_TYPE_READ_PARAMETER = 8;
 
 	protected static final int PKT_RC_OK = 0;
@@ -19,9 +26,12 @@ public class Packet {
 	protected static final int PKT_RC_NO_ACCESS_RIGHTS = 3;
 	protected static final int PKT_RC_CLOCK_ALREADY_CORRECTED = 4;
 	protected static final int PKT_RC_CHANNEL_IS_NOT_OPEN = 5;
+
+	// PKT_TYPE_WRITE_PARAMETER parameter numbers
+	public static final int PKT_W_PARAM_ADDDRESS = 5;
 	
 	
-	private int address;
+	private int address = 0; // set in packet send code
 	private byte[] payload;
 	private int requestCode;
 	
@@ -33,8 +43,7 @@ public class Packet {
 	 * @param address Address to send packet to, 0 is broadcast.
 	 * @param payload Packet payload part.
 	 */
-	protected Packet(int address, int requestCode, byte [] payload) {
-		this.address = address;
+	protected Packet(int requestCode, byte [] payload) {
 		this.requestCode = requestCode;
 		setPayload( payload );
 	}

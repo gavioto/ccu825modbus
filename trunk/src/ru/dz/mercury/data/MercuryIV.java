@@ -11,7 +11,7 @@ import ru.dz.mercury.Mercury230ProtocolException;
  * @author dz
  *
  */
-public class MercuryIV {
+public class MercuryIV extends MercuryRequest {
 	private double [] v;
 	private double [] i;
 	
@@ -22,7 +22,7 @@ public class MercuryIV {
 		v = c.read3dPacket();
 
 		c.sendParameterReadRequestPacket(0x16, 0x21);
-		i = c.read3dPacket();
+		i = MercuryFixed.multiply(0.1, c.read3dPacket());
 	}
 
 	public double[] getV() {
@@ -33,19 +33,19 @@ public class MercuryIV {
 		return i;
 	}
 
-	/*
-	 public double[] getVaverage() {
-
-		return v;
+	
+	 public double getVaverage() {
+		return (v[0]+v[1]+v[2])/3;
 	}
-	 */
+	 
 	public double getItotal() {
 		return i[0]+i[1]+i[2];
 	}
 
-	public void dump() {
-		System.out.println("V = "+v[0]+" "+v[1]+" "+v[2]+" ");
-		System.out.println("I = "+i[0]+" "+i[1]+" "+i[2]+" ");		
+
+	@Override
+	public String toString() {
+		return String.format("V = %6.2f %6.2f %6.2f\nI = %6.2f %6.2f %6.2f", v[0], v[1], v[2], i[0], i[1], i[2]);		
 	}
 	
 }

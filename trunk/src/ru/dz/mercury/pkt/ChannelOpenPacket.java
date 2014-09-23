@@ -4,8 +4,8 @@ import ru.dz.mercury.Mercury230ProtocolException;
 
 public class ChannelOpenPacket extends Packet {
 
-	public ChannelOpenPacket(int address, int level, String passwd) throws Mercury230ProtocolException {
-		super(address,PKT_TYPE_CHANNEL_OPEN,makePayload(level,passwd));
+	public ChannelOpenPacket(int level, String passwd) throws Mercury230ProtocolException {
+		super(PKT_TYPE_CHANNEL_OPEN,makePayload(level,passwd));
 	}
 
 	private static byte[] makePayload(int level, String passwd) throws Mercury230ProtocolException 

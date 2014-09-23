@@ -7,7 +7,7 @@ import ru.dz.mercury.Mercury230ProtocolException;
 import ru.dz.mercury.pkt.EnergyReadRequestPacket;
 import ru.dz.mercury.pkt.Packet;
 
-public class MercuryEnergy 
+public class MercuryEnergy extends MercuryRequest
 {
 	private double[] eTariff1 	= new double[4]; 
 	private double[] eTariff2 	= new double[4]; 
@@ -23,7 +23,7 @@ public class MercuryEnergy
 	 */
 	public MercuryEnergy(Mercury230Connection c) throws IOException, Mercury230ProtocolException
 	{
-		c.sendPacked(new EnergyReadRequestPacket(c.getNetAddress(),0,6));
+		c.sendPacked(new EnergyReadRequestPacket(0,6));
 		Packet pkt = c.readNonRcPacket();
 		
 		//if(pkt.isReturnCodePacket())			throw new Mercury230ProtocolException("Got rc="+pkt.getReturnCode());
@@ -81,6 +81,18 @@ public class MercuryEnergy
 		System.out.println(" Loss="+eLoss[0]);
 	}
 
+	@Override
+	public String toString() {
+		return String.format("Energy T1=%6.2f T2=%6.2f T3=%6.2f T4=%6.2f Total=%6.2f Loss=%6.2f", 
+				eTariff1[0],
+				eTariff2[0],
+				eTariff3[0],
+				eTariff4[0],
+				eTotal[0],
+				eLoss[0]
+				);
+	}
+	
 	/**
 	 * Return energy count for tariff 1.
 	 * <p>
