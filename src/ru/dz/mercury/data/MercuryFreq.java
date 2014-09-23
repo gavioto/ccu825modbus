@@ -5,7 +5,7 @@ import java.io.IOException;
 import ru.dz.mercury.Mercury230Connection;
 import ru.dz.mercury.Mercury230ProtocolException;
 
-public class MercuryFreq {
+public class MercuryFreq extends MercuryRequest {
 	private double frequency;
 	private double[] angle;
 	
@@ -19,12 +19,13 @@ public class MercuryFreq {
 		frequency = MercuryFixed.decode3b(packet,0);
 	}
 
-	public void dump()
-	{
-		System.out.println("Freq = "+frequency+" hz");
-		System.out.println("Angle = "+angle[0]+" "+angle[1]+" "+angle[2]+" ");		
-	}
 
+	
+	@Override
+	public String toString() {
+		return String.format("Freq = %5.2f, Angle = %6.2f %6.2f %6.2f", frequency, angle[0], angle[1], angle[2] );
+	}
+	
 	public double getFrequency() {
 		return frequency;
 	}

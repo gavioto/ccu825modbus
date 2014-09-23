@@ -17,13 +17,15 @@ import ru.dz.mercury.pkt.ChannelOpenPacket;
 import ru.dz.mercury.pkt.ChannelTestPacket;
 import ru.dz.mercury.pkt.Packet;
 import ru.dz.mercury.pkt.ParameterReadRequestPacket;
+import ru.dz.mercury.pkt.ParameterWriteRequestPacket;
 
 
 /**
- * Connect to Mercury 230 AC power meter RS485 port through TCP/IP protocol convertor.
+ * Connect to Mercury 230 AC power meter RS485 port through TCP/IP protocol converter.
  * <p>
- * <li>TODO Read power measure results as displayed on meter indicator.
- * <li>TODO Read instant/max I/V/Freq, etc.
+ * <li>Read power measure results as displayed on meter indicator.
+ * <li>Read instant I/V/Freq
+ * <li>Read active/reactive/total power 
  * <p>
  * 
  * @author dz
@@ -187,7 +189,7 @@ public class Mercury230Connection
 	
 	public void sendPacked(Packet p) throws IOException
 	{
-
+		p.setAddress(netAddress);
 		byte[] toSend = p.getPacketBytes();
 
 		if(dumpPacketData) CCU825Test.dumpBytes("send pkt", toSend);
@@ -206,48 +208,35 @@ public class Mercury230Connection
 
 
 
-	/*
-	void sendLogReadRequestPacket(int nParam, int nRecord) throws IOException
-	{
-		if(nParam == 0)
-		{
-			byte[] payload = new byte[1];
-			payload[0] = 0;
-			sendPacked(PKT_TYPE_READ_RECORD, payload);
-			return;
-		}
 
-		byte[] payload = new byte[2];
-
-		payload[0] = (byte)nParam;
-		payload[1] = (byte)nRecord;
-
-		sendPacked(PKT_TYPE_CHANNEL_OPEN, payload);
-
-	}
-	 */
 
 	void sendParameterReadRequestPacket(int nParam) throws IOException
 	{
-		sendPacked(new ParameterReadRequestPacket(netAddress, nParam));		
+		sendPacked(new ParameterReadRequestPacket(nParam));		
 	}
 
 	public void sendParameterReadRequestPacket(int nParam, int subParam) throws IOException
 	{
-		sendPacked(new ParameterReadRequestPacket(netAddress, nParam, subParam));		
+		sendPacked(new ParameterReadRequestPacket(nParam, subParam));		
 	}
 
 	// ---------------------------------------------------------------------------
 	// Read meter general parameters
 	// ---------------------------------------------------------------------------
 
-	int readDeviceAddress() throws IOException, Mercury230ProtocolException
+	public int readDeviceAddress() throws IOException, Mercury230ProtocolException
 	{
 		sendParameterReadRequestPacket(5);
 		byte[] payload = readNonRcPacket().getPayload();
 		return payload[1];
 	}
 
+	public void programDeviceAddress(int address) throws IOException, Mercury230ProtocolException
+	{
+		byte [] a = new byte[1];
+		sendPacked(new ParameterWriteRequestPacket(Packet.PKT_W_PARAM_ADDDRESS, a));
+	}
+	
 
 	// ---------------------------------------------------------------------------
 	//
@@ -258,7 +247,7 @@ public class Mercury230Connection
 		try {
 			System.out.print("Ping... ");
 
-			sendPacked(new ChannelTestPacket(netAddress));
+			sendPacked(new ChannelTestPacket());
 			int retCode = readRetCodePacket();
 
 			System.out.println("rc = "+retCode);
@@ -282,7 +271,7 @@ public class Mercury230Connection
 	int openChannel(int level, String passwd) throws Mercury230ProtocolException
 	{
 		try {
-			sendPacked(new ChannelOpenPacket(netAddress, level, passwd));
+			sendPacked(new ChannelOpenPacket(level, passwd));
 			return readRetCodePacket();
 		} catch (IOException e) {
 			throw new Mercury230ProtocolException(e);		
@@ -324,106 +313,28 @@ public class Mercury230Connection
 		int addr = c.readDeviceAddress();
 		System.out.println("Device address = "+addr);
 
-		c.getInstantPowerValues();
+		(new MercuryFreq(c)).dump();
+		
+		while(true)
+			getInstantPowerValues(c);
 
 		//while(true)			c.ping();
 
 	}
 
-	private void getInstantPowerValues() throws Mercury230CRCException, Mercury230ProtocolTimeoutException 
+	private static void getInstantPowerValues(Mercury230Connection c) throws Mercury230CRCException, Mercury230ProtocolTimeoutException 
 	{
-		byte[] packet;
 
 		try {
-			//double [] v;
-			//double [] i;
-			double [] angle;
-
-			/*
-			sendParameterReadRequestPacket(0x16, 0x11);
-			v = read3dPacket();
-			System.out.println("V = "+v[0]+" "+v[1]+" "+v[2]+" ");
-
-			sendParameterReadRequestPacket(0x16, 0x21);
-			i = read3dPacket();
-			System.out.println("I = "+i[0]+" "+i[1]+" "+i[2]+" ");
-			*/
 			
-			MercuryIV iv = new MercuryIV(this);
-			iv.dump();
-			
-			(new MercuryFreq(this)).dump();
-
-			/* зафиксированная энергия. ХЗ, что это.
-
-			sendparameterReadRequestPacket(0x14, 0xF0);
-			packet = readPacket().getPayload();
-			CCU825Test.dumpBytes("Energy", packet);
-
-			sendparameterReadRequestPacket(0x14, 0xF1);
-			packet = readPacket().getPayload();
-			CCU825Test.dumpBytes("Energy T1", packet);
-
-			sendparameterReadRequestPacket(0x14, 0xF2);
-			packet = readPacket().getPayload();
-			CCU825Test.dumpBytes("Energy T2", packet);
-
-			sendparameterReadRequestPacket(0x14, 0xF3);
-			packet = readPacket().getPayload();
-			CCU825Test.dumpBytes("Energy T3", packet);
-
-			sendparameterReadRequestPacket(0x14, 0xF4);
-			packet = readPacket().getPayload();
-			CCU825Test.dumpBytes("Energy T4", packet);
-			 */			
-
-			/*
-			// Active power
-			sendParameterReadRequestPacket(0x16, 0x00);
-			double[] p = read4dPacket();
-			System.out.println("P = "+p[0]+" "+p[1]+" "+p[2]+" "+p[3]+" (active)");
-
-			// Reactive power
-			sendParameterReadRequestPacket(0x16, 0x04);
-			double[] q = read4dPacket();
-			System.out.println("Q = "+q[0]+" "+q[1]+" "+q[2]+" "+q[3]+" (reactive)");
-
-			// Full (P+Q) power
-			sendParameterReadRequestPacket(0x16, 0x08);
-			double[] s = read4dPacket();
-			System.out.println("S = "+s[0]+" "+s[1]+" "+s[2]+" "+s[3]+" (full)");
-			*/
-			
+			MercuryIV iv = new MercuryIV(c);			
 			//MercuryPower power = new MercuryPower(this);
-			MercuryActivePower power = new MercuryActivePower(this);
-			power.dump();
-			
-			/*
-			sendPacked(new EnergyReadRequestPacket(netAddress,0,6));
-			packet = readPacket().getPayload();
-			double[] e = new double[4];
+			MercuryActivePower power = new MercuryActivePower(c);
+			MercuryEnergy energy = new MercuryEnergy(c);
 
-			MercuryFixed.decode4x4(packet, 16*0, e);
-			System.out.println("E = "+e[0]+" \t"+e[1]+" \t"+e[2]+" \t"+e[3]+" \t(T1)");
-
-			MercuryFixed.decode4x4(packet, 16*1, e);
-			System.out.println("E = "+e[0]+" \t"+e[1]+" \t"+e[2]+" \t"+e[3]+" \t(T2)");
-
-			MercuryFixed.decode4x4(packet, 16*2, e);
-			System.out.println("E = "+e[0]+" \t"+e[1]+" \t"+e[2]+" \t"+e[3]+" \t(T3)");
-
-			MercuryFixed.decode4x4(packet, 16*3, e);
-			System.out.println("E = "+e[0]+" \t"+e[1]+" \t"+e[2]+" \t"+e[3]+" \t(T4)");
-
-			MercuryFixed.decode4x4(packet, 16*4, e);
-			System.out.println("E = "+e[0]+" \t"+e[1]+" \t"+e[2]+" \t"+e[3]+" \t(Total)");
-
-			MercuryFixed.decode4x4(packet, 16*5, e);
-			System.out.println("E = "+e[0]+" \t"+e[1]+" \t"+e[2]+" \t"+e[3]+" \t(Loss)");
-			 */
-
-			MercuryEnergy energy = new MercuryEnergy(this);
-			energy.dumpForwardActive();
+			iv.dump();
+			power.dump();			
+			energy.dump();
 
 
 
@@ -482,5 +393,29 @@ public class Mercury230Connection
 	}
 
 
+	
+	/* зафиксированная энергия. ХЗ, что это.
+
+	sendparameterReadRequestPacket(0x14, 0xF0);
+	packet = readPacket().getPayload();
+	CCU825Test.dumpBytes("Energy", packet);
+
+	sendparameterReadRequestPacket(0x14, 0xF1);
+	packet = readPacket().getPayload();
+	CCU825Test.dumpBytes("Energy T1", packet);
+
+	sendparameterReadRequestPacket(0x14, 0xF2);
+	packet = readPacket().getPayload();
+	CCU825Test.dumpBytes("Energy T2", packet);
+
+	sendparameterReadRequestPacket(0x14, 0xF3);
+	packet = readPacket().getPayload();
+	CCU825Test.dumpBytes("Energy T3", packet);
+
+	sendparameterReadRequestPacket(0x14, 0xF4);
+	packet = readPacket().getPayload();
+	CCU825Test.dumpBytes("Energy T4", packet);
+	 */			
+	
 
 }
