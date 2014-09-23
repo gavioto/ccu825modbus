@@ -1,9 +1,14 @@
 package ru.dz.mercury.pkt;
 
+import java.util.logging.Logger;
+
 import ru.dz.ccu825.util.CRC16;
 import ru.dz.mercury.Mercury230CRCException;
 
 public class Packet {
+	protected final static Logger log = Logger.getLogger(Packet.class.getName());
+	
+	
 	/** Used in empty packets */
 	protected static final byte [] empty = new byte[0];
 

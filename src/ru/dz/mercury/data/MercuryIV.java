@@ -45,7 +45,7 @@ public class MercuryIV extends MercuryRequest {
 
 	@Override
 	public String toString() {
-		return String.format("V = %6.2f %6.2f %6.2f\nI = %6.2f %6.2f %6.2f", v[0], v[1], v[2], i[0], i[1], i[2]);		
+		return String.format("V = %6.2f %6.2f %6.2f%nI = %6.2f %6.2f %6.2f", v[0], v[1], v[2], i[0], i[1], i[2]);		
 	}
 	
 }

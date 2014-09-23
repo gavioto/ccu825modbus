@@ -22,5 +22,11 @@ public class ParameterWriteRequestPacket extends Packet {
 
 		return payload;
 	}
-	
+
+	@Override
+	public byte[] getPacketBytes() {
+		if(getAddress() == 0)
+			log.severe("Attempt to write parameter with address == 0, will be ignored by Mercury device");
+		return super.getPacketBytes();
+	}
 }
