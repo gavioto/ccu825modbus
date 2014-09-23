@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import ru.dz.ccu825.CCU825Test;
+import ru.dz.mercury.data.MercuryFixed;
 import ru.dz.mercury.pkt.ChannelOpenPacket;
 import ru.dz.mercury.pkt.ChannelTestPacket;
 import ru.dz.mercury.pkt.EnergyReadRequestPacket;
@@ -332,7 +333,7 @@ public class Mercury230Connection
 
 			sendparameterReadRequestPacket(0x16, 0x40);
 			packet = readPacket().getPayload();
-			double freq = decode3b(packet,0);
+			double freq = MercuryFixed.decode3b(packet,0);
 			System.out.println("Freq = "+freq+" hz");
 
 			
@@ -362,29 +363,42 @@ public class Mercury230Connection
 
 			// Active power
 			sendparameterReadRequestPacket(0x16, 0x00);
-			//packet = readPacket().getPayload();
-			//CCU825Test.dumpBytes("Power P", packet);
 			double[] p = read4dPacket();
 			System.out.println("P = "+p[0]+" "+p[1]+" "+p[2]+" "+p[3]+" (active)");
 			
 			// Reactive power
 			sendparameterReadRequestPacket(0x16, 0x04);
-			//packet = readPacket().getPayload();
-			//CCU825Test.dumpBytes("Power Q", packet);
 			double[] q = read4dPacket();
 			System.out.println("Q = "+q[0]+" "+q[1]+" "+q[2]+" "+q[3]+" (reactive)");
 			
 			// Full (P+Q) power
 			sendparameterReadRequestPacket(0x16, 0x08);
-			//packet = readPacket().getPayload();
-			//CCU825Test.dumpBytes("Power S", packet);
 			double[] s = read4dPacket();
 			System.out.println("S = "+s[0]+" "+s[1]+" "+s[2]+" "+s[3]+" (full)");
 			
 			
 			sendPacked(new EnergyReadRequestPacket(netAddress,0,6));
 			packet = readPacket().getPayload();
-			CCU825Test.dumpBytes("Energy", packet);
+			double[] e = new double[4];
+			
+			MercuryFixed.decode4x4(packet, 16*0, e);
+			System.out.println("E = "+e[0]+" \t"+e[1]+" \t"+e[2]+" \t"+e[3]+" \t(T1)");
+
+			MercuryFixed.decode4x4(packet, 16*1, e);
+			System.out.println("E = "+e[0]+" \t"+e[1]+" \t"+e[2]+" \t"+e[3]+" \t(T2)");
+
+			MercuryFixed.decode4x4(packet, 16*2, e);
+			System.out.println("E = "+e[0]+" \t"+e[1]+" \t"+e[2]+" \t"+e[3]+" \t(T3)");
+
+			MercuryFixed.decode4x4(packet, 16*3, e);
+			System.out.println("E = "+e[0]+" \t"+e[1]+" \t"+e[2]+" \t"+e[3]+" \t(T4)");
+
+			MercuryFixed.decode4x4(packet, 16*4, e);
+			System.out.println("E = "+e[0]+" \t"+e[1]+" \t"+e[2]+" \t"+e[3]+" \t(Total)");
+
+			MercuryFixed.decode4x4(packet, 16*5, e);
+			System.out.println("E = "+e[0]+" \t"+e[1]+" \t"+e[2]+" \t"+e[3]+" \t(Loss)");
+
 			
 			
 			
@@ -409,7 +423,7 @@ public class Mercury230Connection
 			IOException, Mercury230ProtocolTimeoutException {
 		double[] v = new double[3];
 		byte[] packet = readPacket().getPayload();
-		decode3x3(packet, v);
+		MercuryFixed.decode3x3(packet, v);
 		return v;
 	}
 
@@ -434,47 +448,14 @@ public class Mercury230Connection
 		packet[6] &= P_MASK;
 		packet[9] &= P_MASK;
 		
-		v[0] = decode3b(packet,0);
-		v[1] = decode3b(packet,3);
-		v[2] = decode3b(packet,6);
-		v[3] = decode3b(packet,9);
+		v[0] = MercuryFixed.decode3b(packet,0);
+		v[1] = MercuryFixed.decode3b(packet,3);
+		v[2] = MercuryFixed.decode3b(packet,6);
+		v[3] = MercuryFixed.decode3b(packet,9);
 		
 		return v;
 	}
 	
 	
-	/**
-	 * Typical V/I/etc reply is 3 values 3 byte each
-	 * <p>
-	 * 
-	 * @param packet Packet to decode
-	 * @param v array of 3 values to put result to
-	 */
-	private void decode3x3(byte[] packet, double[] v) {
-		v[0] = decode3b(packet,0);
-		v[1] = decode3b(packet,3);
-		v[2] = decode3b(packet,6);
-	}
 	
-	/**
-	 * Decode Mercury's 3-byte fixed number as 3-byte int/100
-	 * <p>
-	 * 
-	 * 
-	 * @param packet where to get data from
-	 * @param pos start byte position
-	 * @return decoded double value
-	 */
-	private double decode3b(byte[] packet, int pos) {
-		int i;
-		
-		i = ((int)packet[pos+0]) & 0xFF;
-		i <<= 8;
-		i |= ((int)packet[pos+2]) & 0xFF;
-		i <<= 8;
-		i |= ((int)packet[pos+1]) & 0xFF;
-		
-		return i/100.0;
-		//return i/256.0;
-	}
 }
