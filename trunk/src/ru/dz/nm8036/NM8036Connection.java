@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 
@@ -42,7 +43,9 @@ public class NM8036Connection
 
 		  clientSocket = new Socket(hostName, port);
 		  
-		  clientSocket.setSoTimeout(50); // Wait just 50 msec if no data
+		  //clientSocket.setSoTimeout(50); // Wait just 50 msec if no data
+		  //clientSocket.setSoTimeout(500); // Wait just 500 msec if no data
+		  clientSocket.setSoTimeout(2000); // Wait just 500 msec if no data
 		  
 		  os = clientSocket.getOutputStream();
 		  is = clientSocket.getInputStream();
@@ -50,6 +53,11 @@ public class NM8036Connection
 
 	private void sendByte(byte c) throws IOException {
 		os.write(c);
+	}
+
+	private void sendShort(int s) throws IOException {
+		os.write((byte) (s & 0xFF));
+		os.write((byte) ((s>>8) & 0xFF));
 	}
 
 	private int readByte() throws IOException {
@@ -62,8 +70,8 @@ public class NM8036Connection
 
 	private int readShort() throws IOException {
 		
-		int hi = readByte();
 		int lo = readByte();
+		int hi = readByte();
 		
 		int shortValue = (hi & 0xFF) << 8;
 		shortValue |= (lo & 0xFF);
@@ -136,7 +144,7 @@ public class NM8036Connection
 		
 		for( int i = 0; i < N_AI; i++ )
 		{
-			out[i] = readAinValue();
+			out[i] = readShort();
 		}
 		
 		
@@ -150,36 +158,102 @@ public class NM8036Connection
 			throw new IOException("no 's' echo");
 	}
 		
-	private int readAinValue() throws IOException
-	{
-		return readShort();
-	}
+	
 
 	/**
-	 * PWM values for output, 0-100
+	 * PWM values for output, 0-100.
+	 * <[p>
+	 * Doesn't work in FW 1.8
+	 * 
 	 * @param percentages int[12]
 	 * @throws IOException
 	 * @throws ArrayIndexOutOfBoundsException if percentage not in 0-100 range 
 	 */
 	public void setPwmValues(int[] percentages) throws IOException
 	{
-		drainInput();
-		sendByte((byte)'a');
-		expectByte((byte)'a');
-
-		for( int i = 0; i < N_DO; i++ )
+		//int len = Math.min(N_DO, percentages.length);
+		int len = N_DO;
+		
+		if( percentages.length != N_DO )
+			throw new ArrayIndexOutOfBoundsException(percentages.length);
+		
+		for( int i = 0; i < len; i++ )
 		{
 			int p = percentages[i];
-			if( (p < 0) || (p > 100) )
+			if( (p <= 0) || (p > 100) )
 				throw new ArrayIndexOutOfBoundsException(p);
 		}
 		
+		drainInput();
+		sendByte((byte)'A');
+		expectByte((byte)'A');
+
 		for( int i = 0; i < N_DO; i++ )
-			sendByte((byte)percentages[i]);
+			//sendByte((byte)percentages[i]);
+			sendShort(percentages[i]);
 		
 		for( int i = 0; i < N_DO; i++ )
-			sendByte( (byte)(100-percentages[i]) );
-		
+			//sendByte((byte)(100-percentages[i]));
+			sendShort(101-percentages[i]);
+
+		try {
+		readByte(); // Poor man's delay
+		} catch(SocketTimeoutException e)
+		{
+			
+		}
 	}
 	
+	public static void main(String[] args) throws UnknownHostException, IOException {
+		NM8036Connection c = new NM8036Connection();
+		
+		c.setHostName("moxa.");
+		c.setPort(4002);
+		
+		c.connect();
+
+		
+		//int[] percentages = new int[4] = { 100, 75, 25, 50 };
+		int[] percentages = 
+			{ 
+				100, 75, 25, 50, 
+				100, 75, 25, 50, 
+				100, 75, 25, 50 
+			};
+		c.setPwmValues(percentages );
+		
+		
+		double[] sensors = c.readTemperatureSensors();
+		
+		int i = 0;
+		for(double s : sensors)
+		{
+			System.out.print("temp "+ i++ +" = "+s+"; \t");
+			if( (i%4) == 0 )
+				System.out.println();
+
+		}
+		//System.out.println();
+		
+		int[] analogInputs = c.readAnalogInputs();
+
+		i = 0;
+		for(int in : analogInputs)
+		{
+			double din = in;
+					
+			din *= 5;
+			din /= 1024;
+			//din /= 512;
+					
+			System.out.print("in "+ i++ +" = "+din+"; \t");
+			if( (i%4) == 0 )
+				System.out.println();
+
+		}		
+		System.out.println();
+
+		
+		
+	}
 }
