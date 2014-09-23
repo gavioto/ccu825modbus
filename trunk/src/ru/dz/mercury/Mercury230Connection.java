@@ -10,6 +10,7 @@ import java.net.UnknownHostException;
 import ru.dz.ccu825.CCU825Test;
 import ru.dz.mercury.pkt.ChannelOpenPacket;
 import ru.dz.mercury.pkt.ChannelTestPacket;
+import ru.dz.mercury.pkt.EnergyReadRequestPacket;
 import ru.dz.mercury.pkt.Packet;
 import ru.dz.mercury.pkt.ParameterReadRequestPacket;
 
@@ -29,6 +30,10 @@ public class Mercury230Connection
 	private boolean dumpPacketData = false;
 
 	private static final int MAX_PKT_LEN = 512; // Why? max payload 256?
+
+	/** Power metering data contain special info in hight bits. */
+	private static final byte P_MASK = 0x3F;  
+	
 	private String hostName;
 	private int port;
 
@@ -149,24 +154,9 @@ public class Mercury230Connection
 	}
 
 
-	//private void sendPacked(int requestCode, byte [] payload) throws IOException
 	private void sendPacked(Packet p) throws IOException
 	{
-		/*
-		int pLen = payload.length;
-		byte[] toSend = new byte[pLen+4];
-
-		toSend[0] = netAddress;
-		toSend[1] = (byte) requestCode;
-
-		System.arraycopy(payload, 0, toSend, 2, pLen);
-
-		int crc = calcCRC(toSend,pLen+2);
-
-		toSend[pLen+2] = (byte) (crc & 0xFF);
-		toSend[pLen+3] = (byte) ((crc>>8) & 0xFF);
-		*/
-		
+	
 		byte[] toSend = p.getPacketBytes();
 		
 		if(dumpPacketData) CCU825Test.dumpBytes("send pkt", toSend);
@@ -182,36 +172,17 @@ public class Mercury230Connection
 
 	int readRetCodePacket() throws Mercury230UnexpectedPacketException, Mercury230CRCException, IOException, Mercury230ProtocolTimeoutException
 	{
-		byte[] packet = readPacket().getPayload();
-		if(packet.length != 1)
-			throw new Mercury230UnexpectedPacketException(packet,"Expected result code packet");
+		Packet p = readPacket();
+		if(!p.isReturnCodePacket())
+			throw new Mercury230UnexpectedPacketException(p,"Expected result code packet");
 
-		return packet[0] & 0xF;
+		return p.getReturnCode();
 	}
 
 
 
 
 
-	void sendChannelOpenPacket(int level, String passwd) throws Mercury230ProtocolException, IOException
-	{
-		/*
-		if(passwd.length() > MAX_PASSWD_LEN)
-			throw new Mercury230ProtocolException("password too long");
-
-		byte[] payload = new byte[7];
-
-		payload[0] = (byte)level;
-
-		// TODO convert to one byte string! Russian letters won't work
-		for(int i = 0; i < MAX_PASSWD_LEN; i++)
-		{
-			payload[i+1] = (byte) passwd.charAt(i); 
-		}
-		*/
-		sendPacked(new ChannelOpenPacket(netAddress, level, passwd));
-
-	}
 
 
 	/*
@@ -237,25 +208,25 @@ public class Mercury230Connection
 
 	void sendparameterReadRequestPacket(int nParam) throws IOException
 	{
-		/*
-		byte[] payload = new byte[1];
-		payload[0] = (byte) nParam;
-		*/
 		sendPacked(new ParameterReadRequestPacket(netAddress, nParam));		
 	}
 
 	void sendparameterReadRequestPacket(int nParam, int subParam) throws IOException
 	{
-		/*
-		byte[] payload = new byte[2];
-		payload[0] = (byte) nParam;
-		payload[1] = (byte) subParam;
-		sendPacked(PKT_TYPE_READ_PARAMETER, payload);
-		*/		
 		sendPacked(new ParameterReadRequestPacket(netAddress, nParam, subParam));		
 	}
 
+	// ---------------------------------------------------------------------------
+	// Read meter general parameters
+	// ---------------------------------------------------------------------------
 
+	int readDeviceAddress() throws IOException, Mercury230ProtocolException
+	{
+		sendparameterReadRequestPacket(5);
+		byte[] payload = readPacket().getPayload();
+		return payload[1];
+	}
+	
 
 	// ---------------------------------------------------------------------------
 	//
@@ -290,7 +261,7 @@ public class Mercury230Connection
 	int openChannel(int level, String passwd) throws Mercury230ProtocolException
 	{
 		try {
-			sendChannelOpenPacket(level, passwd);
+			sendPacked(new ChannelOpenPacket(netAddress, level, passwd));
 			return readRetCodePacket();
 		} catch (IOException e) {
 			throw new Mercury230ProtocolException(e);		
@@ -326,10 +297,12 @@ public class Mercury230Connection
 		}
 		c.connect();
 
+		c.ping();
 		c.openChannel(1, "\1\1\1\1\1\1");
 		
-		c.ping();
-
+		int addr = c.readDeviceAddress();
+		System.out.println("Device address = "+addr);
+		
 		c.getInstantPowerValues();
 
 		//while(true)			c.ping();
@@ -362,6 +335,59 @@ public class Mercury230Connection
 			double freq = decode3b(packet,0);
 			System.out.println("Freq = "+freq+" hz");
 
+			
+			/* зафиксированная энергия. ХЗ, что это.
+			
+			sendparameterReadRequestPacket(0x14, 0xF0);
+			packet = readPacket().getPayload();
+			CCU825Test.dumpBytes("Energy", packet);
+			
+			sendparameterReadRequestPacket(0x14, 0xF1);
+			packet = readPacket().getPayload();
+			CCU825Test.dumpBytes("Energy T1", packet);
+
+			sendparameterReadRequestPacket(0x14, 0xF2);
+			packet = readPacket().getPayload();
+			CCU825Test.dumpBytes("Energy T2", packet);
+			
+			sendparameterReadRequestPacket(0x14, 0xF3);
+			packet = readPacket().getPayload();
+			CCU825Test.dumpBytes("Energy T3", packet);
+			
+			sendparameterReadRequestPacket(0x14, 0xF4);
+			packet = readPacket().getPayload();
+			CCU825Test.dumpBytes("Energy T4", packet);
+*/			
+
+
+			// Active power
+			sendparameterReadRequestPacket(0x16, 0x00);
+			//packet = readPacket().getPayload();
+			//CCU825Test.dumpBytes("Power P", packet);
+			double[] p = read4dPacket();
+			System.out.println("P = "+p[0]+" "+p[1]+" "+p[2]+" "+p[3]+" (active)");
+			
+			// Reactive power
+			sendparameterReadRequestPacket(0x16, 0x04);
+			//packet = readPacket().getPayload();
+			//CCU825Test.dumpBytes("Power Q", packet);
+			double[] q = read4dPacket();
+			System.out.println("Q = "+q[0]+" "+q[1]+" "+q[2]+" "+q[3]+" (reactive)");
+			
+			// Full (P+Q) power
+			sendparameterReadRequestPacket(0x16, 0x08);
+			//packet = readPacket().getPayload();
+			//CCU825Test.dumpBytes("Power S", packet);
+			double[] s = read4dPacket();
+			System.out.println("S = "+s[0]+" "+s[1]+" "+s[2]+" "+s[3]+" (full)");
+			
+			
+			sendPacked(new EnergyReadRequestPacket(netAddress,0,6));
+			packet = readPacket().getPayload();
+			CCU825Test.dumpBytes("Energy", packet);
+			
+			
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -374,7 +400,6 @@ public class Mercury230Connection
 	 * Read and decode typical I/V/etc reply with 3 fixed numbers 3 bytes each.
 	 * <p>
 	 * 
-	 * @param i where to put result to
 	 * 
 	 * @throws Mercury230CRCException
 	 * @throws IOException
@@ -387,6 +412,36 @@ public class Mercury230Connection
 		decode3x3(packet, v);
 		return v;
 	}
+
+	/**
+	 * Read and decode typical power reply with 4 fixed numbers 3 bytes each.
+	 * <p>
+	 * NB! We do clear power specific high bits in 1st bytes of 4 numbers 
+	 * 
+	 * 
+	 * @throws Mercury230CRCException
+	 * @throws IOException
+	 * @throws Mercury230ProtocolTimeoutException
+	 */
+	private double[] read4dPacket() throws Mercury230CRCException,
+			IOException, Mercury230ProtocolTimeoutException {
+		double[] v = new double[4];
+		byte[] packet = readPacket().getPayload();
+
+		
+		packet[0] &= P_MASK;
+		packet[3] &= P_MASK;
+		packet[6] &= P_MASK;
+		packet[9] &= P_MASK;
+		
+		v[0] = decode3b(packet,0);
+		v[1] = decode3b(packet,3);
+		v[2] = decode3b(packet,6);
+		v[3] = decode3b(packet,9);
+		
+		return v;
+	}
+	
 	
 	/**
 	 * Typical V/I/etc reply is 3 values 3 byte each
