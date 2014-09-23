@@ -10,13 +10,23 @@ public class Packet {
 	protected static final int PKT_TYPE_CHANNEL_TEST = 0;
 	protected static final int PKT_TYPE_CHANNEL_OPEN = 1;
 	protected static final int PKT_TYPE_READ_RECORD = 4;
+	protected static final int PKT_TYPE_READ_ENERGY = 5;
 	protected static final int PKT_TYPE_READ_PARAMETER = 8;
 
+	protected static final int PKT_RC_OK = 0;
+	protected static final int PKT_RC_UNKNOWN_CMD_OR_PARAMETER = 1;
+	protected static final int PKT_RC_INTERNAL_ERROR = 2;
+	protected static final int PKT_RC_NO_ACCESS_RIGHTS = 3;
+	protected static final int PKT_RC_CLOCK_ALREADY_CORRECTED = 4;
+	protected static final int PKT_RC_CHANNEL_IS_NOT_OPEN = 5;
 	
 	
 	private int address;
 	private byte[] payload;
 	private int requestCode;
+	
+	private boolean returnCodePacket = false;
+	private int returnCode = -1;
 
 	/**
 	 * New packet for transmission.
@@ -44,6 +54,12 @@ public class Packet {
 		int pLen = recvData.length-3;
 		payload = new byte[pLen];
 		System.arraycopy(recvData, 1, payload, 0, pLen);
+		
+		if(pLen == 1)
+		{
+			returnCodePacket = true;
+			returnCode = payload[0] & 0x0F;
+		}
 	}
 
 	public int getAddress() {		return address;	}
@@ -75,6 +91,14 @@ public class Packet {
 
 	public void setRequestCode(int requestCode) {
 		this.requestCode = requestCode;
+	}
+
+	public boolean isReturnCodePacket() {
+		return returnCodePacket;
+	}
+
+	public int getReturnCode() {
+		return returnCode;
 	}
 
 	private int calcCRC(byte [] payload, int len)
